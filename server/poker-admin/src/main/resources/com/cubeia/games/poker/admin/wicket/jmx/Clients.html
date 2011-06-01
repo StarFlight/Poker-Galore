@@ -1,0 +1,28 @@
+<html xmlns:wicket="http://wicket.apache.org/">
+<head>
+</head>
+<body>
+  <wicket:extend>
+    <span wicket:id="feedback"></span>
+    <br/>
+    Clients online: <span wicket:id="clientsOnline"></span>
+  
+   <form wicket:id="systemMessageForm">
+      <table>
+        <tr>
+          <td>
+            <label for="name">System Message</label>
+          </td>
+          <td>
+            <input wicket:id="message" id="message" type="text" size="20"/>
+          </td>
+        </tr>
+      </table>
+      
+      <input type="submit" value="Send"/>
+    </form>  
+  
+  </wicket:extend>
+</body>
+</html>
+

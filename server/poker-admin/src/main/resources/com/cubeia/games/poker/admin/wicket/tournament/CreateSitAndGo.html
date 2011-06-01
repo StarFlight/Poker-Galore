@@ -1,0 +1,63 @@
+<html xmlns:wicket="http://wicket.apache.org/">
+<head>
+</head>
+<body>
+  <wicket:extend>
+    <span wicket:id="feedback">feedbackmessages will be put here</span>
+    
+    <form wicket:id="tournamentForm">
+      <table>
+        <tr>
+          <td>
+            <label for="name">Name</label>
+          </td>
+          <td>
+            <input wicket:id="name" id="name" type="text" size="10"/>
+          </td>
+        </tr>
+        
+        <tr>
+          <td>
+            <label for="seatsPerTable">Seats Per Table</label>
+          </td>
+          <td>
+            <input wicket:id="seatsPerTable" id="seatsPerTable" type="text" size="20"/>
+          </td>
+        </tr>
+        
+         <tr>
+          <td>
+            <label for="timingType">Timing [0(def)|1|2(expr)|3]</label>
+          </td>
+          <td>
+            <input wicket:id="timingType" id="timingType" type="text" size="20"/>
+          </td>
+        </tr>
+        
+         <tr>
+          <td>
+            <label for="minPlayers">Min Players</label>
+          </td>
+          <td>
+            <input wicket:id="minPlayers" id="minPlayers" type="text" size="20"/>
+          </td>
+        </tr>
+        
+         <tr>
+          <td>
+            <label for="maxPlayers">Max Players</label>
+          </td>
+          <td>
+            <input wicket:id="maxPlayers" id="maxPlayers" type="text" size="20"/>
+          </td>
+        </tr>
+       
+      </table>
+      
+      <input type="submit" value="Create"/>
+    </form>  
+  
+  </wicket:extend>
+</body>
+</html>
+

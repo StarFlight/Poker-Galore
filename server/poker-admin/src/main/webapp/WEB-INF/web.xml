@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.4"
+  xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+  <display-name>cep-server</display-name>
+
+  <!-- spring context listener -->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>
+      classpath:spring-app.xml
+    </param-value>
+  </context-param>
+  <listener>
+    <listener-class>
+      org.springframework.web.context.ContextLoaderListener
+    </listener-class>
+  </listener>
+
+  <!-- spring open session in view fileter for hibernate sessions -->
+  <filter>
+    <filter-name>openEMInView</filter-name>
+    <filter-class>
+	  org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter    
+    </filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>openEMInView</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  
+
+  <!--  WICKET -->
+  <filter>
+       <filter-name>WicketApplication</filter-name>
+       <filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
+       <init-param>
+         <param-name>applicationClassName</param-name>
+         <param-value>com.cubeia.games.poker.admin.wicket.WebApp</param-value>
+       </init-param>
+   </filter>
+   <filter-mapping>
+       <filter-name>WicketApplication</filter-name>
+       <url-pattern>/*</url-pattern>
+   </filter-mapping>
+  
+  
+
+   <!-- Index pages -->
+   <welcome-file-list>
+     <welcome-file>index.html</welcome-file>
+   </welcome-file-list>
+  
+  <!-- 
+  <resource-ref>
+     <res-ref-name>jdbc/usersDS</res-ref-name>
+     <res-type>javax.sql.DataSource</res-type>
+     <res-auth>Container</res-auth>
+     <res-sharing-scope>Shareable</res-sharing-scope>
+  </resource-ref>
+  -->
+  
+</web-app>

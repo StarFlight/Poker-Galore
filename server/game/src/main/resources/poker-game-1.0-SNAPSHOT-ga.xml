@@ -1,0 +1,19 @@
+<activator>
+   <!--
+     - Frequency in wich the activator scans the available tables
+     - to check for changes in millis. Default value is 5 seconds. 
+     -->
+    <scan-frequency>1000</scan-frequency>
+    <tables>
+    <!-- Number of seats at the table -->
+    <seats>10</seats>
+    <!-- Minimum number of tables -->
+    <min-tables>100</min-tables>
+    <!-- Min available empty tables -->
+    <min-available-tables>50</min-available-tables>
+    <!-- Increment size, ie. how many tables do we create at one time -->
+    <increment-size>100</increment-size>
+    <!-- Timeout value for empty tables in millis. Default value is 2 minutes. -->
+    <timeout>120000</timeout> 
+    </tables>
+</activator>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <parent>
+    <artifactId>poker</artifactId>
+    <groupId>com.cubeia.games</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.cubeia.games</groupId>
+  <artifactId>poker-tournament</artifactId>
+  <packaging>firebase-tar</packaging>
+  <name>Poker Tournament</name>
+ 
+  <dependencies>
+    <dependency>
+      <groupId>com.cubeia.firebase</groupId>
+      <artifactId>firebase-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.cubeia.firebase</groupId>
+      <artifactId>firebase-protocol</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.cubeia.games</groupId>
+      <artifactId>poker-protocol</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cubeia.games</groupId>
+      <artifactId>poker-logic</artifactId>
+    </dependency>
+     <dependency>
+        <groupId>com.cubeia.games</groupId>
+        <artifactId>poker-persistence</artifactId>
+    </dependency> 
+  </dependencies>
+</project>

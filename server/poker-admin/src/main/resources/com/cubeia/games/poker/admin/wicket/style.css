@@ -1,0 +1,145 @@
+div.top {
+	border-bottom: 1px solid gray;
+	margin-bottom: 4px;
+}
+
+div.menu {
+	float: left;
+	width: 150px;
+	height: 100%;
+	padding-top: 10px;
+	border-right: 1px dotted gray;
+}
+
+div.main {
+	width: 800px;
+	height: 100%;
+	padding-top: 10px;
+	padding-left: 160px;
+}
+
+html, table, p, label {
+	font-size:0.90em;
+	font-family: arial, helvetica, sans-serif;
+}
+
+body {
+	font-size:1em;
+	font-family: arial, helvetica, sans-serif;
+	color: black;
+	background-color: #fff;
+	margin: 1em;
+	padding: 0;
+}
+
+h1 {
+	color: #999;
+	background-color: #fff;
+	font-size: 2em;
+	margin: 0;
+	margin-bottom: 0.5em;
+	padding: 0.25em;
+	font-style: italic;
+	text-align: center;
+	letter-spacing: 0.4em;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: #c00;
+}
+
+h2 {
+	color: #999;
+	background-color: #fff;
+	font-size: 1.5em;
+	margin: 0;
+	padding: 0.1em;
+	padding-left: 1em;
+}
+
+h3 {
+	color: #999;
+	font-size: 1.25em;
+}
+
+a, a:visited, a:hover, a:active, a:link {
+	color: #000;
+}
+
+a.currentMenuItem {
+	text-decoration: none;
+    font-style: normal;
+    font-size: 0.9em;
+    color: orange;
+}
+
+a.currentMenuItem:before {
+	text-decoration: none;
+    content: '\00BB\0020';
+}
+
+a.menuItem {
+	text-decoration: none;
+	color: #000;
+	font-size: 0.9em;
+}
+
+li {
+	font-style: italic;
+}
+
+table {
+	border-collapse: collapse;
+	
+/*	border: none;*/
+}
+
+table .even {
+        background-color: #FFDB98;
+}
+
+table .odd {
+        background-color: #FFEECF;
+}
+
+th {
+	font-weight: normal;
+	border-bottom: solid black 1px;
+	border-top: solid black 1px;
+}
+
+th.wicket_orderDown:after {
+	content: url(images/sort_up.png);
+}
+	
+th.wicket_orderUp:after {
+	content: url(images/sort_down.png);
+}
+
+td {
+	border-right: dotted white 1px;
+	padding-left: 2px;
+    padding-right: 2px;
+}
+
+.navigator {
+}
+
+.navigator em {
+	color: orange;
+}
+
+.navigator a {
+    text-decoration: none;
+}
+
+.headers {
+	background-color: white;	
+}
+
+.feedbackPanelINFO {
+	color: green;
+}
+
+.feedbackPanelERROR {
+	color: red;
+}

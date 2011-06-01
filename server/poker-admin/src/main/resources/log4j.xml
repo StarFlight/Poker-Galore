@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+		
+	<appender name="LOG" class="org.apache.log4j.RollingFileAppender">
+		<param name="File"   value="debug.log" />
+		<param name="Append" value="false" />	    	
+		<param name="MaxBackupIndex" value="5" />
+		<param name="MaxFileSize" value="20MB" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} - %-5p %C - %m%n"/>
+		</layout>	    
+	</appender>
+	
+	<!-- STDOUT, minimize the use of this -->
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p %C{1} - %m%n"/>
+			<!--param name="ConversionPattern" value="%d %-5p [%t] %C{1} (%F:%L) - %m%n"/-->
+		</layout>		
+	</appender>
+	
+	
+	<!-- ****** SERVER LOG CATEGORIES ****** -->
+	
+	
+	<!--
+		Base package for all old-school com.game packages
+	-->
+	<category name="com" additivity="false">
+		<priority value="debug"/>
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="LOG"/>
+	</category>
+	
+	<category name="org.hibernate" additivity="false">
+		<priority value="warn"/>
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="LOG"/>
+	</category>
+		
+	<category name="org.springframework" additivity="false">
+		<priority value="warn"/>
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="LOG"/>
+	</category>
+	
+	<category name="org.apache" additivity="false">
+		<priority value="warn"/>
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="LOG"/>
+	</category>
+	
+	<category name="com.espertech" additivity="false">
+		<priority value="info"/>
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="LOG"/>
+	</category>
+	
+	
+	<root>
+	  <priority value="debug"/>
+	  <appender-ref ref="STDOUT"/>
+	  <appender-ref ref="LOG"/>
+	</root>
+	
+</log4j:configuration>

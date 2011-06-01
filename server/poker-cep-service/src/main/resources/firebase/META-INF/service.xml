@@ -1,0 +1,8 @@
+<service auto-start="false">
+    <name>BeleLoginService</name>
+    <public-id>ns://www.cubeia.com/poker/cep/service</public-id>
+    <contract>com.cubeia.games.poker.cep.PokerCEPService</contract>
+    <service>com.cubeia.games.poker.cep.PokerCEPServiceImpl</service>
+    <description/>
+    <exported/>
+</service>

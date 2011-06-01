@@ -1,0 +1,207 @@
+<protocol version="$Revision: 1 $">
+
+
+    <!-- ==========  Definition Enums ========== -->
+
+	<enum name="suit">
+        <value>CLUBS</value>
+        <value>DIAMONDS</value>
+        <value>HEARTS</value>
+        <value>SPADES</value>
+    </enum>
+    
+    <enum name="rank">
+        <value>TWO</value>
+        <value>THREE</value>
+        <value>FOUR</value>
+        <value>FIVE</value>
+        <value>SIX</value>
+        <value>SEVEN</value>
+        <value>EIGHT</value>
+        <value>NINE</value>
+        <value>TEN</value>
+        <value>JACK</value>
+        <value>QUEEN</value>
+        <value>KING</value>
+        <value>ACE</value>
+    </enum>
+    
+     <enum name="hand_type">
+        <value>UNKNOWN</value>
+        <value>HIGH_CARD</value>
+        <value>PAIR</value>
+        <value>TWO_PAIR</value>
+        <value>THREE_OF_A_KIND</value>
+        <value>STRAIGHT</value>
+        <value>FLUSH</value>
+        <value>FULL_HOUSE</value>
+        <value>FOUR_OF_A_KIND</value>
+        <value>STRAIGHT_FLUSH</value>
+    </enum>
+
+
+    <enum name="hand_phase">
+        <value>PREFLOP</value>
+        <value>FLOP</value>
+        <value>TURN</value>
+        <value>RIVER</value>
+    </enum>
+    
+     <enum name="action_type">
+        <value>SMALL_BLIND</value>
+        <value>BIG_BLIND</value>
+        <value>CALL</value>
+        <value>CHECK</value>
+        <value>BET</value>
+        <value>RAISE</value>
+        <value>FOLD</value>
+        <value>DECLINE_ENTRY_BET</value>
+    </enum>
+
+    <enum name="pot_type">
+        <value>MAIN</value>
+        <value>SIDE</value>
+    </enum>
+    
+    <enum name="player_table_status">
+        <value>NORMAL</value>
+        <value>SITOUT</value>
+        <value>ALLIN</value>
+    </enum>
+     
+	
+	<!-- ==========  Generic Structs ========== -->
+  
+    <struct name="player_action">
+        <var name="type" type="action_type"/>
+        <var name="min_amount" type="int32" />
+        <var name="max_amount" type="int32" />
+    </struct>
+ 
+  
+  
+    <!-- ==========  Game Structs ========== -->
+	
+	<struct name="game_card">
+        <var name="suit" type="suit"/>
+        <var name="rank" type="rank"/>
+    </struct>
+	
+	<struct name="best_hand">
+        <var name="player" type="int32"/>
+        <var name="rank" type="int32"/>
+        <var name="name" type="string"/>
+    </struct>
+	
+	<struct name="player_state">
+        <var name="player" type="int32"/>
+        <list name="open_cards" type="game_card"/>
+        <var name="hidden_cards" type="int32"/>
+        <var name="balance" type="int32" />
+    </struct>
+	
+   
+	
+    <!--
+        Request action from a player.
+        This is sent to all players so everyone is notified about who is supposed to act.
+     -->
+     <struct name="request_action">
+        <var name="seq" type="int32"/>
+     	<var name="player" type="int32"/>
+        <list name="allowed_actions" type="player_action"/>
+        <var name="time_to_act" type="int32"/>
+     </struct>
+  
+	
+	<!-- 
+	    This is sent when a new hand is started.
+	    Dealer is the seat id that should have the dealer button.
+	-->
+	<struct name="start_new_hand">
+       <var name="dealer" type="int16"/>
+    </struct>
+	
+	<struct name="dealer_button">
+        <var name="seat" type="int8"/>
+    </struct>
+	
+	<!--
+	    Deal out the given cards as community cards.
+	-->
+    <struct name="deal_public_cards">
+       <list name="cards" type="game_card"/>
+    </struct>
+
+    <struct name="deal_private_cards">
+        <list name="cards" type="game_card"/>
+    </struct>
+    
+    <struct name="deal_hidden_cards">
+        <var name="player" type="int32"/>
+    	<var name="count" type="int8"/>
+    </struct>
+    
+    <struct name="expose_private_cards">
+        <var name="player" type="int32"/>
+        <list name="cards" type="game_card"/>
+    </struct>
+    
+    <struct name="hand_end">
+        <list name="hands" type="best_hand"/>
+    </struct>
+    
+    <!-- Next actions are part of state history cache -->
+    <struct name="start_hand_history"/>
+
+    <!-- All state history have been sent -->
+    <struct name="stop_hand_history"/>
+    
+	<struct name="perform_action">
+		<var name="seq" type="int32"/>
+		<var name="player" type="int32"/>
+		<var name="action" type="player_action"/>
+		<var name="bet_amount" type="int32"/>
+		<var name="raise_amount" type="int32"/>
+		<var name="stack_amount" type="int32"/> 
+		<var name="timeout" type="bool"/>
+		<var name="balance" type="int32"/>
+	</struct>
+  
+    <struct name="tournament_out">
+        <var name="player" type="int32"/>
+        <var name="position" type="int32"/>
+    </struct>
+
+    <!-- Table balance notification -->
+    <struct name="player_balance">
+        <!-- Balance in the system currency multiplied to contain all fractional digits of the currency.
+             For most currencies it is multiplied by 100. 
+             
+             Sent when the balance has changed for a player. -->
+        <var name="balance" type="int32" />
+        <var name="player" type="int32" />
+    </struct>
+    
+    <struct name="pot">
+        <var name="id" type="int8" />
+        <var name="type" type="pot_type" />
+        <var name="amount" type="int32" />
+    </struct>
+    
+    <!-- A player's status at the table has changed (Server -> Client)-->
+    <struct name="player_poker_status">
+        <var name="player" type="int32"/>
+        <var name="status" type="player_table_status"/>
+        <var name="imageUrl" type="string"/>
+        <var name="winnerFl" type="int32"/>
+    </struct>
+    
+    <!-- A player has requested to sit in again (Client -> Server) -->
+    <struct name="player_sitin_request" />
+    
+     <!-- A player has requested to sit out (Client -> Server) -->
+    <struct name="player_sitout_request" />
+
+</protocol>
+

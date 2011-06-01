@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<game-definition id="7">
+	<name>Poker</name>
+	<version>1.0-SNAPSHOT</version>
+	<classname>com.cubeia.games.poker.PokerGame</classname>
+	<activator>com.cubeia.games.poker.activator.PokerActivator</activator>
+</game-definition>

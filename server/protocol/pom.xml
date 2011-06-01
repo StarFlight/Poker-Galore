@@ -1,0 +1,65 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.cubeia.games</groupId>
+  <artifactId>poker-protocol</artifactId>
+  <name>Poker Protocol</name>
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>com.cubeia.games</groupId>
+    <artifactId>poker</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.cubeia.firebase</groupId>
+      <artifactId>styx</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.cubeia</groupId>
+        <artifactId>protocol-generator-plugin</artifactId>
+        <version>1.7-SNAPSHOT</version>
+        <configuration>
+          <protocol_file>src/main/xml/protocol.xml</protocol_file>
+          <language>all</language>
+          <package_name>com.cubeia.games.poker.io.protocol</package_name>
+          <generate_visitors>true</generate_visitors>
+	  <fail_on_bad_packet_order>true</fail_on_bad_packet_order>
+	</configuration>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <attach>true</attach>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+</project>

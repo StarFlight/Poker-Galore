@@ -1,0 +1,55 @@
+<html xmlns:wicket="http://wicket.apache.org/">
+<head>
+</head>
+<body>
+  <wicket:extend>
+    <span wicket:id="feedback">feedbackmessages will be put here</span>
+
+    <h3>Edit tournament configuration</h3>
+    
+    <form wicket:id="tournamentForm">
+    
+      <table>
+        <tr>
+          <td>
+            ID
+          </td>
+          <td>
+            <span wicket:id="id">1337</span>            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>Name</td>
+          <td><span wicket:id="name">Tourny</span></td>
+        </tr>
+        
+        <tr>
+          <td>Timing Type</td>
+          <td><span wicket:id="timingType">Tourny</span></td>
+        </tr>
+        
+        <tr>
+          <td>Seats Per Table</td>
+          <td><span wicket:id="seatsPerTable">Tourny</span></td>
+        </tr>
+        
+        <tr>
+          <td>Min Players</td>
+          <td><span wicket:id="minPlayers">Tourny</span></td>
+        </tr>
+        
+        <tr>
+          <td>Max Players</td>
+          <td><span wicket:id="maxPlayers">Tourny</span></td>
+        </tr>
+        
+      </table>
+    
+      <input type="submit" value="Submit"/>
+    </form>  
+  
+  </wicket:extend>
+</body>
+</html>
+
