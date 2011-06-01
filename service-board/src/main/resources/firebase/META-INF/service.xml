@@ -1,0 +1,12 @@
+<service auto-start="true">
+    <name>PokerBoardService</name>
+    <public-id>com.board.games.service:PokerBoardService</public-id>
+    <contract>com.cubeia.firebase.api.login.LoginLocator</contract>
+    <contract>com.board.games.service.PokerBoardServiceContract</contract>
+    <service>com.board.games.service.PokerBoardService</service>
+    <dependencies />
+    <description />
+    <exported>
+        <package>com.board.games.service.-</package>
+    </exported>
+</service>
