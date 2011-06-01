@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="172" height="349"
+		  creationComplete="init()" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+	
+	<mx:Script>
+		<![CDATA[
+			import com.cubeia.poker.event.PokerLobbyEvent;
+			import com.cubeia.firebase.io.protocol.SeatInfoPacket;
+			import com.cubeia.firebase.io.protocol.TableQueryResponsePacket;
+			import com.cubeia.firebase.events.PacketEvent;
+			import com.cubeia.firebase.io.protocol.TableQueryRequestPacket;
+			import com.cubeia.poker.lobby.LobbyCanvas;
+			import com.cubeia.model.TableInfo;
+			import com.cubeia.poker.event.LobbyTableEvent;
+			import com.cubeia.poker.event.PokerEventDispatcher;
+			import com.cubeia.model.PokerPlayerInfo;
+			import mx.effects.easing.Quadratic;
+			import com.cubeia.util.players.PlayerRegistry;
+			import mx.collections.ArrayCollection;
+			
+			[Bindable]
+			private var tables:ArrayCollection = new ArrayCollection();
+			
+					
+			private function init():void {
+				// Listen to table selected in lobby
+				// PokerEventDispatcher.instance.addEventListener(LobbyTableEvent.SELECTED, onTableSelected);
+				PokerEventDispatcher.instance.addEventListener(PokerLobbyEvent.VIEW_CHANGED, onLobbyViewChanged);
+				PokerLobby.firebaseClient.addEventListener(PacketEvent.PACKET_RECEIVED, onFirebasePacket);
+				visible = false;
+			}
+			
+			public function onFirebasePacket(event:PacketEvent):void {
+				/* if (event.getObject().classId() == TableQueryResponsePacket.CLASSID) {
+					var packet:TableQueryResponsePacket = event.getObject() as TableQueryResponsePacket;
+					loadPlayers(packet);
+				} */
+			}
+			
+			
+			
+			public function onLobbyViewChanged(event:PokerLobbyEvent):void {
+				if (event.newView != PokerLobbyEvent.SIT_AND_GO) {
+					onHide();
+				} else {
+					//if (table != null) {
+						onShow();
+					//}
+				}
+				
+			}
+			
+		//	public function onTableSelected(event:LobbyTableEvent):void {
+		//		this.table = event.table;
+		//		this.title = table.name+" ("+event.table.id+")";
+				
+		//		var tableQuery:TableQueryRequestPacket = new TableQueryRequestPacket();
+		//		tableQuery.tableid = table.id;
+		//		PokerLobby.firebaseClient.send(tableQuery);
+		//		onShow();
+		//	}
+			
+			
+			
+			private function onShow():void 
+			{
+				if (!visible) 
+				{
+					visible = true;
+				}
+				
+				tournDetailDissolver.stop();
+				tournDetailRessolver.stop();
+				tournDetailRessolver.play();
+			}
+			
+			private function onShowComplete():void 
+			{
+			}
+			
+			private function onHide():void 
+			{
+				tournDetailDissolver.stop();
+				tournDetailDissolver.play();
+			}
+			
+			private function onHideComplete():void 
+			{
+				visible = false;
+				alpha = 1.0;
+			}
+			
+		/* 	private function openTable():void
+			{
+				PokerEventDispatcher.instance.dispatchEvent(new OpenTableEvent());
+			}
+		 */	
+		]]>
+	</mx:Script>
+	
+	<mx:Fade id="tournDetailDissolver" alphaFrom="1.0" alphaTo="0.0" duration="200" target="{this}" effectEnd="onHideComplete()"/>
+	<mx:Fade id="tournDetailRessolver" alphaFrom="0.0" alphaTo="1.0" duration="200" target="{this}" effectEnd="onShowComplete()"/>
+	
+	<mx:List id="tableList" width="100%"
+			 variableRowHeight="true"
+			 dataProvider="{tables}"
+			 x="0" y="0" height="170"/>
+	<mx:Button label="Register" width="132" height="32" horizontalCenter="0" bottom="20"/>
+	<mx:Label text="Close this Panel" horizontalCenter="0" bottom="2" click="onHide()"/>
+	
+	
+</mx:Panel>

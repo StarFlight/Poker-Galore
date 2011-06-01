@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+ 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" width="290" height="134" xmlns:s="library://ns.adobe.com/flex/spark">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.cubeia.firebase.io.protocol.TableChatPacket;
+			import com.cubeia.multitable.bus.MessageBusClient;
+			import com.cubeia.poker.table.model.Table;
+			
+			import mx.events.FlexEvent;
+			
+			[Bindable]
+			private var table:Table;
+			
+			public function setTableModel(table:Table):void {
+				this.table = table;
+			}
+			
+			private function enableAutoScroll():void {
+				chatOutput.addEventListener( FlexEvent.VALUE_COMMIT, autoScrollToBottom );
+			}
+			
+			
+			private function autoScrollToBottom( event:FlexEvent ):void {
+				// Auto-scroll to the bottom anytime the text changes
+				event.target.validateNow();
+				event.target.verticalScrollPosition = event.target.maxVerticalScrollPosition;
+			}
+			
+			private function swallowEnterKey(event:TextEvent):void {
+				// The char code for Enter is 10
+				if (event.text.charCodeAt() == 10) {
+					event.preventDefault();
+				}
+			}
+			
+			private function onChatInputKeyPressed(event:KeyboardEvent):void {
+				// check if the user pressed the Enter key to dispatch chat message
+				if (event.keyCode == Keyboard.ENTER) {
+					sendChat();
+				}	
+			}
+			
+			public function sendChat():void {
+				if (chatInput.text != null && chatInput.text.length > 0) {
+					var packet:TableChatPacket = new TableChatPacket();
+					packet.message = chatInput.text;
+					packet.tableid = table.id;
+					packet.pid = table.myPlayerId;
+					PokerTable.messageBusClient.send(packet);
+					// reset focus to chat entry area
+					updateChatEntryFocus();
+				}
+			}
+			
+			private function updateChatEntryFocus():void {
+				// set focus to chat entry area
+				focusManager.setFocus(chatInput);	
+				chatInput.text = "";
+			}
+		]]>
+	</fx:Script>
+	<mx:TextArea x="10" y="10" width="271" height="84" color="#53C253"  editable="false" id="chatOutput" text="{table.chatOutput}" creationComplete="enableAutoScroll()"/>
+	<mx:TextInput x="10" y="102" width="270" 
+				  id="chatInput" 
+				  keyUp="onChatInputKeyPressed(event)"
+				  textInput="swallowEnterKey(event)"/>
+</mx:Canvas>

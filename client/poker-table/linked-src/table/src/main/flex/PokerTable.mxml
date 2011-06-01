@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pokerLib:StyledApplication 
+	xmlns:pokerLib="com.cubeia.poker.ui.*" 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	width="1024" 
+	height="768" 
+	creationComplete="init()" 
+	xmlns:ns2="com.cubeia.poker.table.component.*" deactivate="onDeactivate()" activate="onActivate()">
+	
+	<mx:Script>
+		<![CDATA[
+			import com.cubeia.firebase.events.PacketEvent;
+			import com.cubeia.firebase.io.ProtocolObject;
+			import com.cubeia.firebase.io.protocol.SeatInfoPacket;
+			import com.cubeia.firebase.io.protocol.WatchRequestPacket;
+			import com.cubeia.firebase.model.PlayerInfo;
+			import com.cubeia.model.PokerPlayerInfo;
+			import com.cubeia.multitable.bus.MessageBusClient;
+			import com.cubeia.poker.event.PokerEvent;
+			import com.cubeia.poker.event.PokerEventDispatcher;
+			import com.cubeia.poker.event.TableEvent;
+			import com.cubeia.poker.table.cards.CardHelper;
+			import com.cubeia.poker.table.handler.TableHandler;
+			import com.cubeia.poker.table.model.Player;
+			import com.cubeia.poker.table.model.Table;
+			import com.cubeia.util.players.PlayerRegistry;
+			
+			import flash.utils.getDefinitionByName;
+			
+			import mx.controls.Alert;
+			import mx.controls.SWFLoader;
+			import mx.core.Application;
+			import mx.core.FlexGlobals;
+			import mx.core.IRawChildrenContainer;
+			import mx.managers.SystemManager;
+			
+			private var swfLoader:Loader;
+			
+			public static var messageBusClient:MessageBusClient;
+			
+			// flag to indicate if sounds should be played
+			public static var soundsEnabled:Boolean = true;
+
+			[Bindable]
+			public static var avatarUrlMap:Object = new Object();
+			
+			[Bindable]
+			public var table:Table;
+			
+			private var pid:int = -1;
+			private var screenname:String = "N/A";
+			private var seatid:int = -1;
+			private var tableid:int = 1;
+			private var tableSize:int = 10;
+			private var autoJoin:Boolean = false;
+			private var busName:String = "_poker_lobby_";
+			private var avatarUrl:String = "";
+			
+			private var tableHandler:TableHandler;
+			
+			// Flag if the client is executed within a QT Wrapper
+			public static var qtDemo:Boolean = false;
+			
+			public function init():void
+			{
+				
+  				pid = FlexGlobals.topLevelApplication.parameters["pid"];
+				screenname = FlexGlobals.topLevelApplication.parameters["screenname"];
+				seatid = FlexGlobals.topLevelApplication.parameters["seatid"];
+				tableid = FlexGlobals.topLevelApplication.parameters["tableid"];
+				tableSize = FlexGlobals.topLevelApplication.parameters["tableSize"];
+				autoJoin = FlexGlobals.topLevelApplication.parameters["autoJoin"];
+				avatarUrl = FlexGlobals.topLevelApplication.parameters["avatarUrl"];
+				busName = FlexGlobals.topLevelApplication.parameters["busName"];
+				
+				table = new Table(tableid, tableSize);
+				table.myPlayerId = pid;
+				tableCanvas.setTableModel(table);
+				chatCanvas.setTableModel(table);
+				actionCanvas.setTableModel(table);
+				statusCanvas.setTableModel(table);
+				messageBusClient = new MessageBusClient();
+				messageBusClient.start(busName, tableid);
+				var wrp:WatchRequestPacket = new WatchRequestPacket();
+				wrp.tableid = tableid;
+				messageBusClient.send(wrp);
+				trace("Table Created. PID="+pid+", screenname="+screenname, "busName:"+busName);
+				
+				var pi:PlayerInfo = new PlayerInfo();
+				pi.pid = pid;
+				pi.screenname = screenname;
+				
+				tableHandler = new TableHandler(table,avatarUrl, pi);
+				
+				PlayerRegistry.instance.addPlayerFromInfo(pi);
+
+				CardHelper.initCards();
+			}		
+			
+			private function onActivate():void {
+				soundsEnabled = true;
+				
+			}
+			
+			private function onDeactivate():void {
+				soundsEnabled = false;
+				
+			}
+		]]>
+	</mx:Script>
+	
+	
+	<ns2:TableCanvas id="tableCanvas" x="0" y="0" />
+	<ns2:PokerActionCanvas x="375" y="18" id="actionCanvas"/>
+	<ns2:ChatCanvas x="10" y="600" id="chatCanvas" height="134" width="290"/>
+	<ns2:StatusCanvas id="statusCanvas" x="608" y="710" height="24"/>
+	<mx:Label x="534" y="260" width="200" text="Main Pot" visible="{table.mainPot > 0}"/>
+	<mx:Text x="534" y="272" text="${Number(table.mainPot/100).toFixed(2)}" width="100" visible="{table.mainPot > 0}"/>
+	<mx:Button x="828" y="725" label="Leave" click="PokerEventDispatcher.dispatch(new TableEvent(TableEvent.LEAVE_TABLE_REQUEST, tableid))"/>
+	
+	
+</pokerLib:StyledApplication>

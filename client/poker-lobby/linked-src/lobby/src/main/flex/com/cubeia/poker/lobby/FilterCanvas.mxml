@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="500" height="40" clipContent="true" horizontalScrollPolicy="off" verticalScrollPolicy="off" xmlns:lobby="com.cubeia.poker.lobby.*">
+
+	<mx:Metadata>
+    	[Event(name="lobby_filter_event", type="com.cubeia.poker.lobby.LobbyFilterEvent")]
+	</mx:Metadata>
+	
+	<mx:Script>
+		<![CDATA[
+			/**
+			 * base lobby path
+			 * 
+			 * example: holdem/real
+			 */
+			[Bindable]
+			[Inspectable]
+			public var lobbyBasePath:String; 
+			
+			private function onFilterClicked(lobbyFilterItem:LobbyFilterItem):void
+			{
+				dispatchEvent(new LobbyFilterEvent(lobbyFilterItem));
+			}
+	
+		]]>
+	</mx:Script>
+	
+	<lobby:LobbyFilterItem x="10" y="0" label="No Limit"  styleName="lobbyFilterText" gameId="7" clientFilter="true"  property1="address" operator="regexp" property2="nolimit" click="dispatchEvent(new LobbyFilterEvent(LobbyFilterItem(event.target)))" selected="true"/>
+	<lobby:LobbyFilterItem x="10" y="18" label="Fixed Limit"  styleName="lobbyFilterText" gameId="7" clientFilter="true"  property1="address" operator="regexp" property2="fixedlimit" click="dispatchEvent(new LobbyFilterEvent(LobbyFilterItem(event.target)))" selected="true"/>
+	<lobby:LobbyFilterItem x="104" y="0" label="Pot Limit"  styleName="lobbyFilterText" gameId="7" clientFilter="true"  property1="address" operator="regexp" property2="potlimit" click="dispatchEvent(new LobbyFilterEvent(LobbyFilterItem(event.target)))" selected="true"/>
+	
+	<mx:Canvas id="filterContainer" x="245" width="289" height="100%" verticalCenter="0"  clipContent="true" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+		<lobby:LobbyFilterItem x="10" y="0" label="Micro" styleName="lobbyFilterText" clientFilter="true"  property1="address" operator="regexp" property2="micro" click="onFilterClicked(LobbyFilterItem(event.target))" selected="true"/>
+		<lobby:LobbyFilterItem x="10" y="16" label="Low"  styleName="lobbyFilterText" clientFilter="true"  property1="address" operator="regexp" property2="low"  click="onFilterClicked(LobbyFilterItem(event.target))" selected="true"/>
+		<lobby:LobbyFilterItem x="71" y="16" label="High"  styleName="lobbyFilterText" clientFilter="true"  property1="address" operator="regexp" property2="high" click="onFilterClicked(LobbyFilterItem(event.target))" selected="true"/>
+		<lobby:LobbyFilterItem x="71" y="0" label="Medium" styleName="lobbyFilterText" clientFilter="true"  property1="address" operator="regexp" property2="medium" click="onFilterClicked(LobbyFilterItem(event.target))" selected="true"/>
+		<lobby:LobbyFilterItem x="148" y="16" label="Not Empty" styleName="lobbyFilterText" gameId="7" clientFilter="true" property1="Seated" operator="nz" click="dispatchEvent(new LobbyFilterEvent(LobbyFilterItem(event.target)))" selected="false" invert="true"/>
+		<lobby:LobbyFilterItem x="148" y="0" label="Not Full"  styleName="lobbyFilterText" gameId="7" clientFilter="true"  property1="Seated" operator="ne" property2="Capacity" click="dispatchEvent(new LobbyFilterEvent(LobbyFilterItem(event.target)))" selected="false" invert="true"/>		
+	</mx:Canvas>
+</mx:Canvas>
+
+

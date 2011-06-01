@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" width="300" height="24" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.cubeia.games.poker.io.protocol.PlayerSitinRequest;
+			import com.cubeia.games.poker.io.protocol.PlayerSitoutRequest;
+			import com.cubeia.poker.table.handler.GamePacketHandler;
+			import com.cubeia.poker.table.model.Table;
+			
+			[Bindable]
+			private var table:Table;
+			
+			public function setTableModel(table:Table):void {
+				this.table = table;
+				
+			}
+			
+			private function sitIn():void {
+				var playerSitinRequest:PlayerSitinRequest = new PlayerSitinRequest();
+				PokerTable.messageBusClient.sendGamePacket(table.myPlayerId, table.id, GamePacketHandler.styxSerializer.pack(playerSitinRequest));
+			}
+			
+			private function sitOut():void {
+				var playerSitoutRequest:PlayerSitoutRequest = new PlayerSitoutRequest();
+				PokerTable.messageBusClient.sendGamePacket(table.myPlayerId, table.id, GamePacketHandler.styxSerializer.pack(playerSitoutRequest));
+			}
+			
+			private function toggleSitout():void {
+				if ( sitoutNextHand.selected ) {
+					sitOut();
+					sitoutNextHand.label = "I'm back";
+				} else {
+					sitoutNextHand.label = "Sit Out Next Hand";
+					sitIn();
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<mx:CheckBox x="10"  label="Sit Out Next Hand" click="toggleSitout()" id="sitoutNextHand" verticalCenter="0"/>
+</mx:Canvas>

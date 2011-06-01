@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="300" height="90" creationComplete="init()">
+	
+	<mx:Script>
+        <![CDATA[
+        	import com.cubeia.firebase.model.PlayerInfo;
+        	import com.cubeia.poker.event.PokerEventDispatcher;
+        	import com.cubeia.poker.event.PokerLobbyEvent;
+        	import com.cubeia.util.players.PlayerRegistry;
+        	import com.cubeia.poker.lobby.component.table.BalanceEvent;
+        	[Bindable]
+        	private var playerInfo:PlayerInfo;
+        	
+        	// FIXME: Do not use URL like this
+        	[Bindable]
+        	private var imageUrl:String;
+        	
+			[Bindable]
+			private var amount:Number;
+			
+        	
+        	private function init():void {
+        		PokerEventDispatcher.instance.addEventListener(PokerLobbyEvent.LOGGED_IN, onLogin);
+				PokerEventDispatcher.instance.addEventListener(BalanceEvent.BALANCE_EVENT, onUpdate);
+				//FIXME
+				//PokerEventDispatcher.instance.addEventListener(PokerLobbyEvent.LEAVE_TABLE, onUpdate);
+				// text="${(seat.player.balance/100).toFixed(2)}"
+			}
+			
+			private function onLogin(event:PokerLobbyEvent):void {
+				playerInfo = PokerLobby.playerInfo;
+				imageUrl = PokerLobby.playerAvatarUrl; //  PlayerRegistry.instance.getPlayer(playerInfo.pid).imageUrl;
+				
+			}
+			
+			private function onUpdate(event:BalanceEvent):void {
+				amount = event.amount;
+			}
+			
+          ]]>
+    </mx:Script>
+    
+	<mx:Label text="{playerInfo.screenname}" id="usernameLabel" styleName="userheading" width="150" left="64" top="0"/>
+	<mx:Label text="Balance: ${(amount/100).toFixed(2)}"  left="64" top="22"/>
+	<mx:Image id="userImage" source="{imageUrl}" top="4" height="50" width="50" left="6"/>
+<!--	<mx:Label text="Skill Points: ..." left="64" top="38"/>-->
+    
+</mx:Canvas>

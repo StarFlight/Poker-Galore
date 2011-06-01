@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="95" height="76" styleName="tableSeat"
+	creationComplete="init()" verticalScrollPolicy="off" horizontalScrollPolicy="off" clipContent="false" 
+	xmlns:component="com.cubeia.poker.table.component.*" xmlns:s="library://ns.adobe.com/flex/spark"
+	>
+	
+	<mx:Style source="table2.css" />
+
+	<mx:states>
+        <mx:State name="empty">
+        	<mx:SetProperty target="{this}" name="styleName" value="tableSeatEmpty"/>
+        	<mx:AddChild position="lastChild">
+        		<mx:Button y="23" label="Take Seat" horizontalCenter="0" click="joinTable()"/>
+        	</mx:AddChild>
+        </mx:State>
+        
+        <mx:State name="reserved">
+        	<mx:SetProperty target="{this}" name="styleName" value="tableSeatReserved"/>
+        </mx:State>
+        
+        <mx:State name="{Player.STATUS_WAITING_TO_ACT}">
+        	<mx:SetProperty target="{this}" name="styleName" value="tableSeatWaitingToAct"/>
+        </mx:State>
+        
+        <mx:State name="{Player.STATUS_ACTED}">
+        	<mx:SetProperty target="{this}" name="styleName" value="tableSeatActed"/>
+        </mx:State>
+        
+        <mx:State name="{Player.STATUS_SITOUT}">
+        	<mx:SetProperty target="{this}" name="styleName" value="tableSeatSitout"/>
+        </mx:State>
+		
+		<mx:State name="{Player.STATUS_ALLIN}">
+			<mx:SetProperty target="{this}" name="styleName" value="tableSeatAllIn"/>
+		</mx:State>
+        
+        <mx:State name="unknown">
+        	<mx:SetProperty target="{this}" name="styleName" value="tableSeatUnknown"/>
+        </mx:State>
+    </mx:states>
+
+
+	<mx:Script>
+		<![CDATA[
+			import com.cubeia.firebase.io.protocol.JoinRequestPacket;
+			import com.cubeia.games.poker.io.protocol.GameCard;
+			import com.cubeia.poker.event.PokerEventDispatcher;
+			import com.cubeia.poker.event.TableEvent;
+			import com.cubeia.poker.table.cards.VectCardFactory;
+			import com.cubeia.poker.table.cards.WrappedGameCard;
+			import com.cubeia.poker.table.chipstack.ChipStackFactory;
+			import com.cubeia.poker.table.model.Player;
+			import com.cubeia.poker.table.model.Seat;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.events.PropertyChangeEvent;
+			import mx.controls.Alert;
+		
+			public var playerWatcher:ChangeWatcher;
+			public var playerStatusWatcher:ChangeWatcher;
+		
+			[Bindable]
+			public var seat:Seat;
+			
+			private function init():void {
+				if (seat.player == null) {
+					currentState = "empty";
+				} else {
+					currentState = "reserved";
+				}
+				watch();
+			}
+			
+			private function watch():void {
+				playerWatcher = ChangeWatcher.watch(seat,["player"], onPlayerChange);
+				watchPlayerObject();
+				watchPlayerTimeToAct();
+				
+			}
+			
+			private function watchPlayerObject():void {
+				playerStatusWatcher = ChangeWatcher.watch(seat,["player","status"], onPlayerStatusChange);
+			}
+			
+			private function watchPlayerTimeToAct():void {
+				playerStatusWatcher = ChangeWatcher.watch(seat,["player","timeToAct"], onPlayerTimeToActChange);
+			}
+			
+			
+			private function onPlayerChange(event:PropertyChangeEvent):void {
+				if (seat.player == null) {
+					currentState = "empty";
+					playerStatusWatcher.unwatch();
+				} else {
+					currentState = "reserved";
+					watchPlayerObject();
+				}
+			}
+			
+			private function onPlayerStatusChange(event:PropertyChangeEvent):void {
+				if (seat.player != null) {
+					currentState = seat.player.status;
+					if (seat.player.winnerFl == 1) {
+						seat.handWinner =  true;
+					} else {
+						seat.handWinner =  false;
+					}
+				}
+			}
+			
+			private function onPlayerTimeToActChange(event:PropertyChangeEvent):void {
+				if (seat.player != null) {
+					if ( seat.player.timeToAct == 0 ) {
+						timeoutBar.stop();
+					} else {
+						timeoutBar.start(seat.player.timeToAct);
+					}
+				}
+			}
+			
+			private function joinTable():void {
+				var event:TableEvent = new TableEvent(TableEvent.JOIN_TABLE_REQUEST, seat.tableId, seat.id);
+				PokerEventDispatcher.dispatch(event);
+			}
+		]]>
+	</mx:Script>
+	
+	<!-- Filters and Effects -->
+	<mx:Glow id="glow" duration="200"  
+			 alphaFrom="0" alphaTo="1"
+			 blurXFrom="0.0" blurXTo="30.0" 
+			 blurYFrom="0.0" blurYTo="30.0"  strength="2"
+			 color="#CC0000" target="{playerImage}"/>
+	
+	<mx:Glow id="unglow" duration="800"  
+			 alphaFrom="1" alphaTo="0"
+			 blurXFrom="30.0" blurXTo="0.0"
+			 blurYFrom="30.0" blurYTo="0.0"  strength="2"
+			 color="#CC0000" target="{playerImage}"/>
+	
+	<s:Rotate3D id="rotate3DY"
+				target="{this}"
+				angleYFrom="0"
+				angleYTo="360"
+				duration="2000"
+				autoCenterTransform="true" />
+	
+	<mx:Label x="2" y="0" text="{seat.player.screenname}" width="100%" styleName="seatPlayerName" height="16"/>
+	<mx:Label x="80" y="0" text="${(seat.player.balance/100).toFixed(2)}" width="70" height="20" visible="{seat.player.balance > 0}"/>
+	
+	<mx:Image id="playerImage" x="4" y="18" width="90" height="55" source="{seat.player.imageUrl}" useHandCursor="true" buttonMode="true"
+			  rollOver="glow.play();" rollOut="unglow.play();" mouseDown="rotate3DY.play();"/>
+	
+	<mx:Image x="-8" y="4" id="playerIcon" source="assets/player_icon.png" visible="{seat.mySeat}"/>
+	
+	<mx:Image x="15" y="-25" id="winner" source="assets/winner.png" visible="{seat.handWinner}"/>
+	
+	<component:TimeoutBar y="75" id="timeoutBar" left="4" right="4">
+	</component:TimeoutBar>
+	
+</mx:Canvas>

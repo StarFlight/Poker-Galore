@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="172" height="349"
+	creationComplete="init()" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+	
+	<mx:Script>
+        <![CDATA[
+			import com.cubeia.firebase.connector.FirebaseClient;
+			import com.cubeia.firebase.events.PacketEvent;
+			import com.cubeia.firebase.io.ProtocolObject;
+			import com.cubeia.firebase.io.protocol.MttPickedUpPacket;
+			import com.cubeia.firebase.io.protocol.MttRegisterRequestPacket;
+			import com.cubeia.firebase.io.protocol.MttSeatedPacket;
+			import com.cubeia.firebase.io.protocol.MttTransportPacket;
+			import com.cubeia.firebase.io.protocol.PlayerInfoPacket;
+			import com.cubeia.firebase.io.protocol.SeatInfoPacket;
+			import com.cubeia.firebase.io.protocol.ServiceTransportPacket;
+			import com.cubeia.firebase.io.protocol.SystemInfoRequestPacket;
+			import com.cubeia.firebase.io.protocol.SystemInfoResponsePacket;
+			import com.cubeia.firebase.io.protocol.TableQueryRequestPacket;
+			import com.cubeia.firebase.io.protocol.TableQueryResponsePacket;
+			import com.cubeia.games.poker.io.protocol.TournamentOut;
+			import com.cubeia.model.PokerPlayerInfo;
+			import com.cubeia.model.TableInfo;
+			import com.cubeia.poker.event.LobbyTableEvent;
+			import com.cubeia.poker.event.PokerEventDispatcher;
+			import com.cubeia.poker.event.PokerLobbyEvent;
+			import com.cubeia.poker.lobby.LobbyCanvas;
+			import com.cubeia.poker.lobby.LobbyJoinEvent;
+			import com.cubeia.poker.lobby.MTTRegisterEvent;
+			import com.cubeia.util.players.PlayerRegistry;
+			import com.hurlant.util.der.Integer;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.effects.easing.Quadratic;
+			
+	   		[Bindable]
+	   		private var table:TableInfo;
+			
+			[Bindable]
+			private var avatarUrlList:String;
+	   		
+			[Bindable]
+			public var players:ArrayCollection = new ArrayCollection();
+			
+			
+	   		private function init():void {
+	   			// Listen to table selected in lobby
+	   			PokerEventDispatcher.instance.addEventListener(LobbyTableEvent.SELECTED, onTableSelected);
+	   			PokerEventDispatcher.instance.addEventListener(PokerLobbyEvent.VIEW_CHANGED, onLobbyViewChanged);
+				// Setup packet data listener
+	   			PokerLobby.firebaseClient.addEventListener(PacketEvent.PACKET_RECEIVED, onFirebasePacket);
+
+//				PokerLobby.firebaseClient.addEventListener(MTTRegisterEvent.MTT_REGISTER_EVENT, onMTTRegister);
+				
+	   			visible = false;
+			}
+			
+			public function onMTTRegister(mttRegisterEvent:MTTRegisterEvent):void
+			{
+				var mttregPacket:MttRegisterRequestPacket = new MttRegisterRequestPacket();
+				mttregPacket.mttid = mttRegisterEvent.mttId;
+				PokerLobby.firebaseClient.send(mttregPacket); 		
+			}	
+			
+			public function onFirebasePacket(event:PacketEvent):void {
+				
+				var protocolObject:ProtocolObject = event.getObject();
+				
+/* 				if ( !tableInstance ) {
+					if ( protocolObject.classId() == SystemInfoResponsePacket.CLASSID ) {
+						var sirp:SystemInfoResponsePacket = SystemInfoResponsePacket(protocolObject);
+						playerCount.text = sirp.players.toString();
+					}
+					
+					if ( protocolObject.classId() == MttSeatedPacket.CLASSID ) {
+						Alert.show("receiving  MttSeatedPacket.CLASSID event");
+						var mttSeatedPacket:MttSeatedPacket = MttSeatedPacket(protocolObject);
+						var lobbyJoinEvent:LobbyJoinEvent = new LobbyJoinEvent(mttSeatedPacket.tableid, lobby.getTableSize(mttSeatedPacket.mttid), mttSeatedPacket.seat);
+						Alert.show("join table");
+						onJoinTable(lobbyJoinEvent, true, mttSeatedPacket.mttid);
+					} else if ( protocolObject.classId() == NotifySeatedPacket.CLASSID ) {
+						onNotifySeatedPacket(NotifySeatedPacket(protocolObject));
+					}
+					return;
+				}
+				 */
+				
+				if ( protocolObject.classId() == ServiceTransportPacket.CLASSID ) {
+					var serviceTransportPacket:ServiceTransportPacket = ServiceTransportPacket(protocolObject);
+					var retVal:String  = serviceTransportPacket.servicedata.readUTFBytes(serviceTransportPacket.servicedata.length);
+					var responseData:Array = retVal.split(";");
+					if (responseData[0] == "1") {
+						//user balance reset
+ 					} else	if (responseData[0] == "2") {
+						PokerLobby.playerAvatarUrl = responseData[2];
+						var playerId:String = responseData[1] as String;
+					 }  else	if (responseData[0] == "3") {
+						var max:int = (responseData.length - 1) / 3;
+						var counter:int = 0;
+						for ( var i:int = 1; i <= responseData.length; i++ ) {
+							if (counter < max ) { 
+								if (responseData[i]  != null && responseData[i+1] != null && responseData[i+2] != null) { 
+									var playerId:String = responseData[i] as String;
+									var playerAvatarUrl:String = responseData[i+1];
+									var playerName:String = responseData[i+2];
+									var info:PlayerInfoPacket = new PlayerInfoPacket();
+									info.pid = int(playerId);
+									info.nick = playerName;
+									var player:PokerPlayerInfo = PlayerRegistry.instance.addPlayer(info); //seat.player
+									i+=2;
+									// UI
+									player.imageUrl = playerAvatarUrl;
+									addPlayer(player);
+									counter++;
+								}
+							}
+						}						
+					 } else	if (responseData[0] == "4") {
+						 var amount:String = responseData[2] as String;
+						 var playerId:String = responseData[1] as String;
+						 PokerLobby.playerBalance = new Number(amount);
+						 //Alert.show("bal " + amount + " id " + playerId + " pb " + String(PokerLobby.playerBalance));
+						 PokerEventDispatcher.instance.dispatchEvent(new BalanceEvent(PokerLobby.playerBalance));
+					}
+			    } else if (protocolObject.classId() == TableQueryResponsePacket.CLASSID) {
+					var packet:TableQueryResponsePacket = event.getObject() as TableQueryResponsePacket;
+					loadPlayers(packet);
+				}else if ( protocolObject.classId() == MttSeatedPacket.CLASSID ) {
+					Alert.show("receiving  MttSeatedPacket.CLASSID event");
+					var mttSeatedPacket:MttSeatedPacket = MttSeatedPacket(protocolObject);
+					//FIXME
+					var lobbyJoinEvent:LobbyJoinEvent = new LobbyJoinEvent(mttSeatedPacket.tableid, 10, mttSeatedPacket.seat); //lobby.getTableSize(mttSeatedPacket.mttid)
+					onJoinTable(lobbyJoinEvent, true, mttSeatedPacket.mttid);
+				}				
+		//FIXME		
+/* 				} else if (protocolObject.classId() == MttPickedUpPacket.CLASSID) {
+					var mttPickedUpPacket:MttPickedUpPacket = MttPickedUpPacket(protocolObject);
+					if ( !mttPickedUpPacket.keepWatching ) {
+						if ( mttPickedUpPacket.tableid == tableId ) {
+							client.close();
+							if (ExternalInterface.available) 
+							{ 
+								ExternalInterface.call("window.close");
+							}
+						}
+					} else {
+						table.removeMySelf();
+					}
+			
+				} else if (protocolObject.classId() == MttTransportPacket.CLASSID) {
+			
+					var mttTransportPacket:MttTransportPacket = MttTransportPacket(protocolObject);
+					if ( mttTransportPacket.pid == pid && mttTransportPacket.mttid == mttId )
+					{
+						var mttPacket:ProtocolObject = styx.unpack(mttTransportPacket.mttdata);
+						trace("MttransportPacket: " + mttPacket.classId());
+						switch (mttPacket.classId()) 
+						{
+							case TournamentOut.CLASSID :
+								table.handleTournamentOut(TournamentOut(mttPacket));
+								break;
+						}
+					}
+				}	 */			
+/* 				if (event.getObject().classId() == TableQueryResponsePacket.CLASSID) {
+					var packet:TableQueryResponsePacket = event.getObject() as TableQueryResponsePacket;
+					loadPlayers(packet);
+				}			
+ */			
+			
+			
+			
+			}
+			
+	   		public function addPlayer(player:PokerPlayerInfo):void {
+            	players.addItem(player);
+            }
+            
+            public function onLobbyViewChanged(event:PokerLobbyEvent):void {
+            	if (event.newView != PokerLobbyEvent.RING_GAME) {
+            		onHide();
+            	} else {
+            		if (table != null) {
+            			onShow();
+            		}
+            	}
+            	
+            }
+            
+            public function onTableSelected(event:LobbyTableEvent):void {
+            	this.table = event.table;
+            	this.title = table.name+" ("+event.table.id+")";
+            	
+            	var tableQuery:TableQueryRequestPacket = new TableQueryRequestPacket();
+            	tableQuery.tableid = table.id;
+            	PokerLobby.firebaseClient.send(tableQuery);
+            	onShow();
+            }
+
+			
+			private function loadPlayers(packet:TableQueryResponsePacket):void 
+			{
+				players.removeAll();
+				var idList:String = "";
+				var request:String = "3;";
+				
+ 				var count:int = 0;
+				for each (var seat:SeatInfoPacket in packet.seats) {
+					idList += seat.player.pid;
+					if (count < packet.seats.length) {
+						idList += ";"
+					}
+					count++;
+				}
+				request += idList;
+				if (packet.seats.length > 0) { 
+					PokerLobby.getMultipleAvatarUrl(PokerLobby.playerInfo.pid, request);
+				}	
+			}
+			
+			
+			
+			private function onShow():void 
+			{
+				if (!visible) 
+				{
+					visible = true;
+				}
+				
+				tableDetailDissolver.stop();
+				tableDetailRessolver.stop();
+				tableDetailRessolver.play();
+			}
+			
+			private function onShowComplete():void 
+			{
+			}
+			
+			private function onHide():void 
+			{
+				tableDetailDissolver.stop();
+				tableDetailDissolver.play();
+			}
+			
+			private function onHideComplete():void 
+			{
+				visible = false;
+				alpha = 1.0;
+			}
+			
+			private function openTable():void
+			{
+				PokerEventDispatcher.instance.dispatchEvent(new OpenTableEvent());
+			}
+
+			
+			public function onJoinTable(lobbyJoinEvent:LobbyJoinEvent, auto:Boolean = false, mttId:int = -1):void
+			{
+			}
+			
+			
+        ]]>
+    </mx:Script>
+    
+	<mx:Fade id="tableDetailDissolver" alphaFrom="1.0" alphaTo="0.0" duration="200" target="{this}" effectEnd="onHideComplete()"/>
+	<mx:Fade id="tableDetailRessolver" alphaFrom="0.0" alphaTo="1.0" duration="200" target="{this}" effectEnd="onShowComplete()"/>
+	
+	<mx:List id="chatList" width="100%"
+	 	variableRowHeight="true"
+    	dataProvider="{players}"
+    	itemRenderer="com.cubeia.poker.lobby.component.table.PlayerTile" x="0" y="0" height="170"/>
+	<mx:Button label="Open Table" width="132" height="32" horizontalCenter="0" bottom="20" click="openTable()"/>
+	<mx:Label text="Close this Panel" horizontalCenter="0" bottom="2" click="onHide()"/>
+	<mx:Label x="2" y="175" text="Stake: {table.stake}"/>
+	<mx:Label x="2" y="190" text="Speed: {table.speed}"/>
+    	
+</mx:Panel>

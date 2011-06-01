@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" width="182" height="6" borderStyle="none" creationComplete="init()" enterFrame="onEnterFrame()" visible="false">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.utils.getTimer;
+			
+			import mx.graphics.GradientEntry;
+			import mx.graphics.LinearGradient;
+			
+			private var sprite:Sprite ;
+			private var fill:LinearGradient = new LinearGradient();
+			
+			private var g1:GradientEntry = new GradientEntry(0xFF0000,0,.8);
+			private var g2:GradientEntry = new GradientEntry(0xFFFF00,.70,.8);
+			private var g3:GradientEntry = new GradientEntry(0x00FF00,.90,.8);
+			
+			private var timer:Timer = new Timer(500,1);
+			private var value:Number = 0;
+			private var step:Number = 1;
+			private var filler:BitmapData;			
+			private var running:Boolean = false;
+			private var startTime:int;
+			
+			public function start(timeout:int):void
+			{
+				visible = true;
+				startTime = getTimer();
+				value = timeout - 500;
+				step = 100;
+				timer.start();
+			}
+			
+			public function onTimer(e:Event):void 
+			{
+				timer.stop();
+				running = true;	
+			}
+			
+			public function stop():void
+			{
+				var g:Graphics = sprite.graphics;
+				visible = false;
+				g.clear();
+				running = false;
+			}
+			
+			public function init():void
+			{
+				sprite = new Sprite();
+				
+				fill.entries = [g1,g2,g3];
+				
+				var g:Graphics = sprite.graphics;
+				g.clear();
+				g.lineStyle(1,0x33CCFF,0);
+				
+				g.moveTo(0,0);
+				
+				fill.begin(g, new Rectangle(0,0,width,height), new Point(0,0));
+				g.lineTo(width,0);
+				g.lineTo(width,height);
+				g.lineTo(0,height);
+				g.lineTo(0,0);  
+				
+				fill.end(g);
+				filler = new BitmapData(width,height);
+				filler.draw(sprite);
+				
+				sprite = new Sprite();
+				rawChildren.addChild(sprite);
+				
+				timer.addEventListener(TimerEvent.TIMER, onTimer);
+				
+			}
+			
+			public function onEnterFrame():void
+			{
+				if ( running && step > 0 )
+				{
+					var now:int = getTimer();
+					var diff:int = now-startTime;
+					if ( diff >= value ) {
+						stop();
+						return;
+					}
+					startTime = now;
+					step -= Number(diff / value) * 100;
+					
+					var x:int = (width / 100) * step;
+					x = Math.min(width-2,x);
+					
+					var color:int = filler.getPixel(x,3);
+					
+					var g:Graphics = sprite.graphics;
+					g.clear();
+					g.lineStyle(1,color,0);
+					g.beginFill(color);
+					g.moveTo(2,2);
+					
+					g.lineTo(width-2,2);
+					g.lineTo(width-2,height-2);
+					g.lineTo(2,height-2);
+					g.lineTo(2,2);  
+					g.endFill();
+					
+					sprite.scrollRect = new Rectangle(2,2,x,height-2);
+				}
+			}
+			
+			
+
+		]]>
+	</fx:Script>
+</mx:Canvas>

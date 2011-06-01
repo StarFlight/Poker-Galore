@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="700" height="100" styleName="emphasis" creationComplete="init()">
+
+	<mx:Script>
+        <![CDATA[
+        	import com.cubeia.util.players.PlayerRegistry;
+        	import com.cubeia.poker.event.PokerLobbyEvent;
+        	import com.cubeia.poker.event.PokerEventDispatcher;
+        	import com.cubeia.firebase.model.PlayerInfo;
+        
+        	
+        	private function init():void {
+        		PokerEventDispatcher.instance.addEventListener(PokerLobbyEvent.VIEW_CHANGED, onLobbyViewChanged);
+			}
+			
+			private function onLobbyViewChanged(event:PokerLobbyEvent):void {
+				if (event.newView == PokerLobbyEvent.TOURNAMENT) {
+					fadeOut.play([banner1]);
+					fadeIn.play([banner2]);
+				} else if (event.newView != PokerLobbyEvent.TOURNAMENT && event.oldView == PokerLobbyEvent.TOURNAMENT) {
+					fadeOut.play([banner2]);
+					fadeIn.play([banner1]);
+				}
+			}
+          ]]>
+    </mx:Script>
+	
+		<mx:Fade id="fadeIn" alphaFrom="0.0" alphaTo="1.0" duration="1000"/>
+		<mx:Fade id="fadeOut" alphaFrom="1.0" alphaTo="0.0" duration="1000"/>
+	
+
+	
+	<mx:Image id="banner2" x="0" y="0" width="100%" height="100%" source="assets/banner2.png" scaleContent="false"/>
+	<mx:Image id="banner1" x="0" y="0" width="100%" height="100%" source="assets/banner1.png" scaleContent="false"/>
+
+<!--	<mx:SWFLoader x="0" y="0"  height="100%" width="100%"  source="assets/banner2.swf" scaleContent="true" id="banner2"/>	
+	<mx:SWFLoader x="0" y="0"  height="100%" width="100%"  source="assets/banner1.swf" scaleContent="true" id="banner1"/>-->	
+	
+	
+</mx:Canvas>

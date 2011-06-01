@@ -1,0 +1,47 @@
+<PokerSettings>
+	<host name="ec2.cubeia.com" port="4123"/>
+	<deck public="images/cards_public.png" private="images/cards_private.png"/>
+	<defaultStyle name="sunnight"/>
+	
+	<styles>
+		<style name="sunnight"/>
+		<style name="default"/>
+		<style name="facebook"/>
+	</styles>
+	
+	<Tables>
+
+	<Table seats="6">
+		<Seat index="0" x="629" y="27"  buttonPosX="684" buttonPosY="109" csPosX="684" csPosY="102"/>
+		<Seat index="1" x="872" y="233" buttonPosX="840" buttonPosY="257" csPosX="842" csPosY="248"/>
+		<Seat index="2" x="629" y="431" buttonPosX="684" buttonPosY="399" csPosX="684" csPosY="370"/>
+		<Seat index="3" x="273" y="431" buttonPosX="330" buttonPosY="399" csPosX="333" csPosY="370"/>
+		<Seat index="4" x="39"  y="233" buttonPosX="187" buttonPosY="257" csPosX="192" csPosY="243"/>
+		<Seat index="5" x="273" y="28"  buttonPosX="330" buttonPosY="110" csPosX="333" csPosY="102"/>
+	</Table>
+	
+
+	<Table seats="10">
+		<Seat index="0" x="4"   y="140"  buttonPosX="130" buttonPosY="150" csPosX="120" csPosY="20"/>
+		<Seat index="1" x="4"   y="4"    buttonPosX="90" buttonPosY="96" csPosX="120" csPosY="66"/>
+		<Seat index="2" x="180" y="4"    buttonPosX="270" buttonPosY="80" csPosX="50" csPosY="66"/>
+		<Seat index="3" x="340" y="4"    buttonPosX="420" buttonPosY="80" csPosX="50" csPosY="66"/>
+		<Seat index="4" x="500" y="4"    buttonPosX="516" buttonPosY="96" csPosX="-24" csPosY="66"/>
+		<Seat index="5" x="500" y="140"  buttonPosX="470" buttonPosY="150" csPosX="-24" csPosY="20"/>
+		<Seat index="6" x="500" y="280"  buttonPosX="520" buttonPosY="244" csPosX="-24" csPosY="-40"/>
+		<Seat index="7" x="340" y="280"  buttonPosX="406" buttonPosY="264" csPosX="40" csPosY="-40"/>
+		<Seat index="8" x="180" y="280"  buttonPosX="260" buttonPosY="264" csPosX="50" csPosY="-40"/>
+		<Seat index="9" x="4"   y="280"  buttonPosX="90" buttonPosY="244" csPosX="120" csPosY="-40"/>
+	</Table>
+
+	<Table seats="2">
+		<Seat index="0" x="783" y="385" buttonPosX="751" buttonPosY="400" csPosX="720" csPosY="360"/>
+		<Seat index="1" x="135" y="385" buttonPosX="283" buttonPosY="400" csPosX="310" csPosY="360"/>
+	</Table>
+
+						
+	</Tables>
+
+
+</PokerSettings>
+

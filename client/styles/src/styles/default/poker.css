@@ -1,0 +1,47 @@
+/* CSS file */
+@namespace "http://www.adobe.com/2006/mxml";
+
+
+/*
+//------------------------------
+//  Application
+//------------------------------
+*/
+Application
+{
+}
+
+/*
+//------------------------------
+//  Canvas
+//------------------------------
+*/
+Canvas
+{
+} 
+
+/*
+//------------------------------
+//  Lobby Data Grid
+//------------------------------
+*/
+DataGrid {
+   headerStyleName: "mydataGridHeaderStyle";
+}
+
+.mydataGridHeaderStyle {
+}
+
+.lobbyFilterText
+{
+}
+
+
+/*
+//------------------------------
+//  TextArea
+//------------------------------
+*/
+TextArea
+{
+}

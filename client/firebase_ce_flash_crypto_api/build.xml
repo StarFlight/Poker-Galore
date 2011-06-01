@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<project name="firebase" basedir="./" default="all">
+
+	<!-- Define variables/paths used in this build script -->
+	<property file="./build/build.properties" />
+	<property file="./build/version.properties" />
+
+	<property name="version" value="${major.version}.${minor.version}"/>
+
+	<!--
+		Have you edit the properties file to make sure the paths are right oo your system?
+	-->
+	<target name="properties">
+		<fail unless="asdoc.exe">The "asdoc.exe" property must be set in ${build.dir}/build.properties.</fail>
+		<fail unless="compc.exe">The "compc.exe" property must be set in ${build.dir}/build.properties.</fail>
+		<fail unless="mxmlc.exe">The "mxmlc.exe" property must be set in ${build.dir}/build.properties.</fail>
+	</target>
+	
+	
+	<!--
+		Compile all of the classes under the "src" tree into a .swc file
+	-->
+	<target name="dist" depends="properties">
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${output.dir}/lib" includes="**/*" />
+		</delete>
+
+		<exec executable="${compc.exe}" dir="${basedir}">
+			<!-- Specify the name of the output file -->
+			<arg line="-o '${output.dir}/lib/${library.name}-${version}.swc'" />
+		
+			<!-- Include the necessary framework libraries as external libraries -->
+			<arg line="-el '${flex2sdk.lib.dir}'" />
+			
+			<arg line="-el ${lib.dir}"/>
+			
+			<!-- Specify the main source path as "src" -->
+			<arg line="-sp ${src.dir}" />
+			
+			<!-- Include all of the classes in the "src" tree -->
+			<arg line="-is ${src.dir}" />
+		</exec>
+	</target>
+	
+	<!--
+		Generate ASDoc output for the library
+	-->
+	<target name="docs" depends="properties">
+		<!-- Clean out the contents of the doc directory, without delete "docs" -->
+		<!--
+		-->
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${output.dir}/doc" includes="**/*" />
+		</delete>
+		
+		<exec executable="${asdoc.exe}" spawn="no">
+			<!-- Place the documentation in the "docs" directory -->
+			<arg line="-o ${output.dir}/doc" />
+			
+			<!-- Include in the corelib.swc in the class path -->
+			<!--arg line="-l ${corelib.swc}" /-->
+			
+			<!-- Specify the main source path as "src" -->
+			<arg line="-sp ${src.dir}" />
+			
+			<!-- Document all of the classes in the "src" tree -->
+			<arg line="-ds ${src.dir} " />
+			
+			<!-- Include the library name in the window title -->
+			<arg line="-window-title 'Cubeia Firebase Flash API - ${library.name}-${version}' "/>
+			
+			<arg line="-main-title 'Cubeia Firebase Flash API'"/>
+		</exec>
+	</target>
+
+	<target name="src" depends="properties">
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${output.dir}/src" includes="**/*" />
+		</delete>
+
+ 		<copy todir="${output.dir}/src">
+    		<fileset dir="${src.dir}">
+      		<include name="**/*.as"/>
+    		</fileset>
+  		</copy>
+	</target>
+
+	<target name="all" depends="dist,docs,src">
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${dist.dir}" includes="**/*" />
+		</delete>
+		<zip destfile="${dist.dir}/${library.name}-${version}.zip" basedir="${output.dir}" />
+	</target>
+
+</project>

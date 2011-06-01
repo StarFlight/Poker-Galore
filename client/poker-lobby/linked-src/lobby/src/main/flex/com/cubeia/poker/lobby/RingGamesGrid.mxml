@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="700" height="350">
+	
+	<mx:Script>
+		<![CDATA[
+			import com.cubeia.model.TableInfo;
+			import com.cubeia.poker.event.LobbyTableEvent;
+			import com.cubeia.poker.event.PokerEventDispatcher;
+			import com.cubeia.poker.lobby.component.table.OpenTableEvent;
+			
+			import flash.net.navigateToURL;
+			
+			import mx.collections.ArrayCollection;
+			
+			[Bindable]
+			public var lobbyData:ArrayCollection = new ArrayCollection();		
+			
+			private function selectedItemChanged():void {
+				var event:LobbyTableEvent = new LobbyTableEvent(LobbyTableEvent.SELECTED);
+				var table:TableInfo = new TableInfo();
+				table.id = dg.selectedItem.tableId;
+				table.name = dg.selectedItem.Name;
+				table.stake = dg.selectedItem.Stakes;
+				table.speed = dg.selectedItem.Speed;
+				table.stake = dg.selectedItem.Ante;
+				event.table = table;
+				PokerEventDispatcher.instance.dispatchEvent(event);
+			}
+			
+			private function setupOpenTableListener():void
+			{
+				PokerEventDispatcher.instance.addEventListener(OpenTableEvent.OPEN_TABLE_EVENT, openTable);
+			}
+			private function openTable(event:OpenTableEvent):void
+			{
+				 if ( dg.selectedItem != null ) {
+					var table:Object = dg.selectedItem;
+					if (ExternalInterface.available) { 
+	 					var path:String = "PokerTable.html"
+ 						var pid:String = PokerLobby.playerInfo.pid.toString();
+						var screenname:String = PokerLobby.playerInfo.screenname;
+						var avatarUrl:String = PokerLobby.playerAvatarUrl;
+						var resource:String = path + "?tableid="+table.tableId+ "&tableSize=" + table.Capacity + "&busName=" + PokerLobby.busName + "&pid=" + pid + "&screenname=" + screenname + "&seatid=-1&autoJoin=false";
+						trace("Open Table with path: "+resource);
+						
+						if (PokerLobby.qtDemo) {
+							// For QT Demo
+							ExternalInterface.call("actionHandler.open", resource, "Cubeia Poker Table " + table.tableId + "("+pid+")", 700,576);
+						} else {
+							// This opens a new small window without controls
+							ExternalInterface.call("window.open", resource, "Cubeia Poker Table " + table.tableId + "("+pid+")", "height=768,width=1024,toolbar=no,scrollbars=no");
+							
+ 							
+/* 							try{
+								navigateToURL(new URLRequest(resource), '_self');
+								//var winTitle:String = "Cubeia Poker Table " + table.tableId.toString() + "("+pid+")";
+								//var js:String = "window.open(resource,winTitle,'height=576,width=700,toolbar=no,scrollbars=no');"; 
+								//var url:URLRequest = new URLRequest("javascript:" + js + " void(0);"); 
+								//navigateToURL(url, "_self");							
+							}
+							catch (event:Error) {
+								trace("Error occurred!");
+							}								
+ */ 							
+						}
+					}
+				} 
+			}
+			
+			
+			
+		]]>
+	</mx:Script>
+	
+	
+	<mx:DataGrid id="dg" dataProvider="{lobbyData}" enabled="true" width="100%" height="100%" 
+		x="0" y="0" alpha="1.0" change="selectedItemChanged()" creationComplete="setupOpenTableListener()"
+		doubleClickEnabled="true" itemDoubleClick="openTable(null)" >
+		<mx:columns>
+			<mx:DataGridColumn headerText="Id" dataField="tableId" width="20" />
+			<mx:DataGridColumn headerText="Table" dataField="Name" width="100" />
+			<mx:DataGridColumn headerText="Stakes" dataField="Ante" width="50" />
+			<mx:DataGridColumn headerText="Type" dataField="type" width="30"/>
+			<mx:DataGridColumn headerText="Plyrs" dataField="PlayerCount" width="30"/>
+			<mx:DataGridColumn headerText="Avg Pot" dataField="avg_pot" width="40"/>
+			<mx:DataGridColumn headerText="Plrs/Flop" dataField="players_flop" width="40"/>
+		</mx:columns>
+	</mx:DataGrid>
+</mx:Canvas>

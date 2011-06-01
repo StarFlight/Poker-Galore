@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="332" height="106" xmlns:component="com.cubeia.poker.table.component.*">
+	
+	<mx:Script>
+		<![CDATA[
+			import com.cubeia.games.poker.io.protocol.ActionTypeEnum;
+			import com.cubeia.games.poker.io.protocol.PerformAction;
+			import com.cubeia.games.poker.io.protocol.PlayerAction;
+			import com.cubeia.games.poker.io.protocol.PlayerSitinRequest;
+			import com.cubeia.games.poker.io.protocol.PlayerSitoutRequest;
+			import com.cubeia.poker.table.handler.GamePacketHandler;
+			import com.cubeia.poker.table.model.Player;
+			import com.cubeia.poker.table.model.Table;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.events.PropertyChangeEvent;
+			
+			[Bindable]
+			private var table:Table;
+			
+			public var tableWatcher:ChangeWatcher;
+			
+			private var callState:String = "";
+			
+			[Bindable]
+			private var callAmount:Number = 0;
+			
+			private var minBetAmount:Number = 0;
+			private var maxBetAmount:Number = 0;
+			
+			public function setTableModel(table:Table):void {
+				this.table = table;
+				tableWatcher = ChangeWatcher.watch(table,["requestAction"], onRequestAction);
+			}
+			
+			private function onRequestAction(event:PropertyChangeEvent):void {
+				hideControls();
+				for each ( var playerAction:PlayerAction in table.requestAction.allowedActions ) {
+					// FIXME: auto blinds for now
+					if ( playerAction.type == ActionTypeEnum.BIG_BLIND || playerAction.type == ActionTypeEnum.SMALL_BLIND) {
+						sendAction(playerAction.type, playerAction.minAmount);
+						return;
+					}
+				
+					enableAction(playerAction);
+				}
+			}
+			
+			private function enableAction(playerAction:PlayerAction):void {
+
+				minBetAmount = playerAction.minAmount  / 100;
+				maxBetAmount = playerAction.maxAmount  / 100;
+
+				switch ( playerAction.type ) {
+					case ActionTypeEnum.BET :
+						betButton.visible = true;
+						enableBetSlider(playerAction.minAmount, playerAction.maxAmount);
+						betSlider.value = playerAction.minAmount / 100;
+						setTextAmounts();
+						break;
+					case ActionTypeEnum.CALL :
+						// enableBetSlider(playerAction.minAmount, playerAction.maxAmount);
+						callAmount = playerAction.minAmount / 100;
+						callButton.visible = true;
+						break;
+					case ActionTypeEnum.CHECK :
+						checkButton.visible = true;
+						break;
+					case ActionTypeEnum.FOLD :
+						foldButton.visible = true;
+						break;
+					case ActionTypeEnum.RAISE :
+						enableBetSlider(playerAction.minAmount, playerAction.maxAmount);
+						betSlider.value = playerAction.minAmount / 100;
+						raiseButton.visible = true;
+						break;
+				}
+				setTextAmounts();
+				
+			}
+			
+			private function action(type:int):void {
+				
+				sounds.playAction(type);
+				
+				switch ( type ) {
+					case ActionTypeEnum.BET :
+						sendAction(type, int(betSlider.value * 100));
+						break;
+					case ActionTypeEnum.CALL :
+						sendAction(type, int(callAmount * 100));
+						break;
+					case ActionTypeEnum.CHECK :
+						sendAction(type, int(betSlider.value * 100));
+						break;
+					case ActionTypeEnum.FOLD :
+						sendAction(type, 0);
+						break;
+					case ActionTypeEnum.RAISE :
+						sendAction(type, int(betSlider.value * 100));
+						break;
+				}
+				
+				
+			}
+
+			private function sendAction(actionType:int, betAmount:int, raiseAmount:int = 0):void
+			{
+				var performAction:PerformAction = new PerformAction();
+				performAction.player = table.myPlayerId;
+				performAction.action = new PlayerAction();
+				performAction.action.type = actionType;
+				performAction.betAmount = betAmount;
+				performAction.raiseAmount = raiseAmount;
+				performAction.seq = table.requestAction.seq;
+				
+				PokerTable.messageBusClient.sendGamePacket(table.myPlayerId, table.id, GamePacketHandler.styxSerializer.pack(performAction));
+				hideControls();
+			}
+
+			
+			private function hideControls():void {
+				for each ( var displayObject:DisplayObject in getChildren() ) {
+					displayObject.visible = false;
+				}				
+			}
+			
+			private function enableBetSlider(minAmount:Number, maxAmount:Number):void {
+				betSlider.minimum = minAmount / 100;
+				betSlider.maximum = maxAmount / 100;
+				betSlider.visible = true;
+				label1.visible = true;
+			}
+			
+			private function onBetChange():void {
+				setTextAmounts();
+			}
+				
+			private function setTextAmounts():void {
+				if ( callAmount == maxBetAmount ) {
+					callButton.label = "ALL IN";
+				} else {
+					callButton.label = "Call $" + callAmount;
+				}
+				if ( maxBetAmount == betSlider.value ) {
+					betButton.label = "ALL IN";
+					raiseButton.label = "ALL IN";
+				} else {
+					betButton.label = "Bet $" + betSlider.value;
+					raiseButton.label = "Raise to $" + betSlider.value;
+				}		
+			}
+			
+			
+		
+			
+		]]>
+	</mx:Script>
+
+
+	<mx:Button x="98" y="10"  label="Call" id="callButton" width="80" enabled="{table.betControlsEnabled}" visible="false" click="action(ActionTypeEnum.CALL)"/>
+	<mx:Button x="10" y="10"  label="Fold" id="foldButton" width="80"  enabled="{table.betControlsEnabled}" visible="false" click="action(ActionTypeEnum.FOLD)"/>
+	<mx:Button x="186" y="10" label="Bet" id="betButton" width="136"  enabled="{table.betControlsEnabled}" visible="false" click="action(ActionTypeEnum.BET)"/>
+	<mx:Button x="186" y="10" label="Raise" id="raiseButton" width="136" enabled="{table.betControlsEnabled}" visible="false" click="action(ActionTypeEnum.RAISE)"/>
+	<mx:Button x="98" y="10"  label="Check" id="checkButton" width="80" enabled="{table.betControlsEnabled}" visible="false" click="action(ActionTypeEnum.CHECK)"/>
+		
+	<mx:HSlider y="61" id="betSlider" styleName="tableBetSlider" snapInterval="1" x="10" enabled="{table.betControlsEnabled}" visible="false" change="onBetChange()" liveDragging="true"/> 
+	<mx:Label x="178" y="55" text="$ {betSlider.value}" id="label1" visible="false"/>
+	<component:SoundManager id="sounds" visible="false"/>
+</mx:Canvas>

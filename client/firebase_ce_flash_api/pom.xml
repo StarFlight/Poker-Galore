@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.cubeia.firebase</groupId>
+  <artifactId>firebase-flash-api</artifactId>
+  <version>1.7-CE-SNAPSHOT</version>
+  <name>Firebase Flash API</name>
+  <packaging>swc</packaging>
+  
+  <parent>
+    <groupId>com.cubeia.firebase.client</groupId>
+    <artifactId>api-root</artifactId>
+    <version>1.7-CE-SNAPSHOT</version>
+  </parent>
+  
+  <dependencies>
+    <dependency>
+      <groupId>com.adobe.flex.framework</groupId>
+      <artifactId>flex-framework</artifactId>
+      <version>3.2.0.3958</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>com.cubeia.firebase</groupId>
+      <artifactId>firebase-protocol</artifactId>
+      <version>1.7-CE-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.cubeia.firebase</groupId>
+      <artifactId>firebase-flash-crypto-api</artifactId>
+      <version>1.7-CE-SNAPSHOT</version>
+	<type>swc</type>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <sourceDirectory>src/main/flex</sourceDirectory>
+    <testSourceDirectory>src/test/flex</testSourceDirectory>
+    <plugins>
+      <!-- plugin>
+	<artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+	  <execution>
+	    <phase>package</phase>
+            <goals>
+	      <goal>copy-dependencies</goal>
+            </goals>
+	    <configuration>
+	      <outputDirectory>${project.build.directory}/lib</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+	    <id>clearGeneratedSource</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <tasks>
+		<property name="srcDirectory" value="${basedir}/src"/>
+		<ant antfile="${basedir}/build.xml">
+                  <target name="clean-generated-sources"/>
+                </ant>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+          <execution>
+	    <id>assembly</id>
+            <phase>package</phase>
+            <configuration>
+              <tasks>	
+		<property name="version" value="${project.version}" />
+		<property name="name" value="${project.artifactId}" />
+		<property name="buildDirectory" value="${project.build.directory}"/>
+		<property name="srcDirectory" value="${basedir}/src"/>
+		<ant antfile="${basedir}/build.xml">
+                  <target name="assembly"/>
+                </ant>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.flexmojos</groupId>
+        <artifactId>flexmojos-maven-plugin</artifactId>
+        <version>3.3.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <locales>
+            <locale>en_US</locale>
+          </locales>
+        </configuration>
+      </plugin>
+	    <plugin>
+		<groupId>com.mycila.maven-license-plugin</groupId>
+		<artifactId>maven-license-plugin</artifactId>
+		<version>1.5.0</version>
+		<configuration>
+		    <header>../../src/main/resources/docs/header.txt</header>
+		    <failIfMissing>true</failIfMissing>
+		    <aggregate>false</aggregate>
+		    <includes>
+		      <include>src/main/flex/com/cubeia/**/*.as</include>
+		    </includes>
+		    <properties>
+			<owner>Cubeia Ltd</owner>
+			<year>2009</year>
+			<email>info@cubeia.com</email>
+		    </properties>
+		</configuration>
+		<!-- executions>
+		    <execution>
+			<id>check-headers</id>
+			<phase>verify</phase>
+			<goals>
+			    <goal>check</goal>
+			</goals>
+		    </execution>
+		</executions -->
+	    </plugin>
+      <plugin>
+        <groupId>com.cubeia</groupId>
+        <artifactId>protocol-generator-plugin</artifactId>
+        <version>1.7.0</version>
+        <configuration>
+          <language>flash</language>
+	  <protocol_dependency>com.cubeia.firebase:firebase-protocol:firebase-protocol.xml</protocol_dependency>
+	  <append_language_to_output_base_dir>false</append_language_to_output_base_dir>
+	  <output_base_dir>src/main/flex</output_base_dir>
+          <package_name>com.cubeia.firebase.io.protocol</package_name>
+          <generate_visitors>true</generate_visitors>
+	  <fail_on_bad_packet_order>true</fail_on_bad_packet_order>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

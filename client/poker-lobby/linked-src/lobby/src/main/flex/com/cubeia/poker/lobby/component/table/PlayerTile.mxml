@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" styleName="chatTile" verticalScrollPolicy="off" horizontalScrollPolicy="off" height="12">
+
+	<mx:Label x="24" text="{data.name}" id="nameLabel" styleName="userNameLabel" verticalCenter="0"/>
+	<mx:Image x="2" y="0" source="{data.imageUrl}" id="avatar" width="12" height="12" scaleContent="true"/>
+	
+</mx:Canvas>

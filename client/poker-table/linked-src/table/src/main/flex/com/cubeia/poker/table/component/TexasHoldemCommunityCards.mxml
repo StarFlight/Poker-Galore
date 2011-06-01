@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="375" height="88" xmlns:cards="com.cubeia.poker.table.cards.*" creationComplete="init()" clipContent="true" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.cubeia.games.poker.io.protocol.GameCard;
+			import com.cubeia.poker.event.PokerEventDispatcher;
+			import com.cubeia.poker.table.cards.CommunityCard;
+			import com.cubeia.poker.table.model.Table;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.events.CollectionEvent;
+			import mx.events.CollectionEventKind;
+			import mx.events.PropertyChangeEvent;
+			
+			[Bindable]
+			private var table:Table;
+			
+			public var tableWatcher:ChangeWatcher;
+			
+			private function init():void {}
+			
+			public function setTableModel(table:Table):void {
+				this.table = table;
+				table.communityCards.addEventListener(CollectionEvent.COLLECTION_CHANGE, onPublicCards);
+				tableWatcher = ChangeWatcher.watch(table,["handHistoryMode"], onHandHistoryChanged);
+			}
+			
+			private function onHandHistoryChanged(event:PropertyChangeEvent):void {
+				// trace("handHistoryMode [" + table.handHistoryMode + "]");
+				if ( table.handHistoryMode == true ) {
+					
+					showCards();
+				}
+			}
+			
+			private function showCards():void {
+				
+			}
+				
+			
+			private function onPublicCards(event:CollectionEvent):void {
+				if ( event.kind == CollectionEventKind.REPLACE ) {
+					for ( var i:int = 0; i < event.items.length; i ++ ) {
+						var propChangedEvent:PropertyChangeEvent = event.items[i];
+						if ( propChangedEvent.newValue == null ) {
+							// null value detected, delete card if it exists
+							if ( communityCards.numElements > i ) {
+								communityCards.removeElementAt(i);
+							}
+						} else {
+							// create a new card
+							var communityCard:CommunityCard = new CommunityCard();
+							communityCards.addElement(communityCard);
+							communityCard.showCard(propChangedEvent.newValue as GameCard);
+						}
+					}
+				}				
+			}
+		]]>
+	</fx:Script>
+	
+	<s:HGroup x="0" y="0" width="375" height="88"  id="communityCards">
+	</s:HGroup>
+</mx:Canvas>

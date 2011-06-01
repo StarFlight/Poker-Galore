@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" width="25" height="40">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.cubeia.poker.table.cards.VectCardFactory;
+			import com.cubeia.poker.table.cards.WrappedGameCard;
+			
+			private var gameCard:WrappedGameCard;
+			
+			[Bindable]
+			[Inspectable]
+			public function get card():WrappedGameCard {
+				return gameCard;
+			}
+				
+			public function set card(wrappedGameCard:WrappedGameCard):void
+			{
+				if ( wrappedGameCard == null ) {
+					removeAllChildren();
+					cardImage =  new Image();
+					cardImage.width = 25;//50;
+					cardImage.height = 40; //80 ;
+					addChild(cardImage);
+				} else {
+					gameCard = wrappedGameCard;
+					cardImage.source = VectCardFactory.instance.getCardImage(gameCard);
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<mx:Image x="0" y="0" id="cardImage" width="25" height="40"/>
+	
+</mx:Canvas>

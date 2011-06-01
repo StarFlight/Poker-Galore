@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 
+		 	xmlns:s="library://ns.adobe.com/flex/spark"
+			width="70" height="88">
+	<mx:Script>
+		<![CDATA[
+			import com.cubeia.games.poker.io.protocol.GameCard;
+			
+			import mx.controls.Image;
+			
+			import spark.components.SkinnableContainer;
+			
+			private var backSide:Image;
+			private var frontSide:Image;
+
+			private function show():void
+			{
+				if ( backSide == null ) {
+					backSide = loadBackside();
+					if ( backSide == null ) {
+						callLater(show);
+						return;
+					}
+				}
+				cardImage.addChild(backSide);
+				
+				fadeIn.play([cardImage]);
+			}
+			
+			private function loadBackside():Image
+			{
+				var bitmap:Bitmap = VectCommunityCardFactory.instance.getBackCard();
+				if ( bitmap == null ) {
+					return null;
+				}
+				
+				var image:Image = new Image();
+				image.width = 70;
+				image.height = 88;
+				image.addChild(bitmap);
+
+				return image; 					
+			}
+			
+			
+			public function showCard(card:GameCard):void
+			{
+				var cardFront:Bitmap = VectCommunityCardFactory.instance.getCard(card);
+				if ( cardFront == null ) {
+					callLater(showCard, [card]);
+					return;
+				}
+				frontSide = new Image();
+				frontSide.addChild(cardFront);
+				show();
+			}
+			
+			private function showFront():void
+			{
+				cardImage.removeChild(backSide);
+				cardImage.width = 70;
+				cardImage.height = 88;
+				cardImage.addChild(frontSide);
+				rotate3DY2.play();  
+			}
+			
+			public function hideCard():void
+			{
+				fadeOut.play([cardImage]);					
+			}
+
+			private function deleteCards():void
+			{
+				if ( cardImage.contains(backSide) ) {
+					cardImage.removeChild(backSide);
+				}
+				
+				if ( cardImage.contains(frontSide) ) {
+					cardImage.removeChild(frontSide);
+				}
+			}
+			
+			private function animate():void {
+				rotate3DY1.play();
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<s:Fade alphaFrom="0" alphaTo="100" duration="1000" id="fadeIn" effectEnd="animate()"/>
+	<s:Fade alphaFrom="100" alphaTo="0" duration="1000" id="fadeOut" effectEnd="deleteCards()"/>
+	
+	<s:Rotate3D id="rotate3DY1"
+                target="{cardImage}"
+                angleYFrom="0"
+                angleYTo="90"
+                duration="500"
+                autoCenterTransform="true"
+                effectEnd="showFront()"/>
+                
+	<s:Rotate3D id="rotate3DY2" 
+                target="{cardImage}"
+                angleYFrom="270"
+                angleYTo="360"
+                duration="500"
+                autoCenterTransform="true"/>
+
+	<mx:Image x="0" y="0"  width="70" height="88"  id="cardImage" visible="false"/>
+					
+</mx:Canvas>

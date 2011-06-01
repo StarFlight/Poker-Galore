@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pokerLib:StyledApplication xmlns:mx="http://www.adobe.com/2006/mxml" 
+							layout="absolute" 
+							initialize="init();"
+							xmlns:pokerLib="com.cubeia.poker.ui.*" 
+							xmlns:ns1="com.cubeia.poker.lobby.*" 
+							width="100%" height="100%" currentState="login">
+
+		
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	
+	
+	<mx:Script>
+		<![CDATA[
+			import com.cubeia.firebase.connector.FirebaseClient;
+			import com.cubeia.firebase.events.ConnectEvent;
+			import com.cubeia.firebase.events.DisconnectEvent;
+			import com.cubeia.firebase.events.LoginResponseEvent;
+			import com.cubeia.firebase.events.PacketEvent;
+			import com.cubeia.firebase.io.ProtocolObject;
+			import com.cubeia.firebase.io.protocol.LoginRequestPacket;
+			import com.cubeia.firebase.io.protocol.PlayerInfoPacket;
+			import com.cubeia.firebase.io.protocol.ServiceTransportPacket;
+			import com.cubeia.firebase.model.PlayerInfo;
+			import com.cubeia.model.PokerPlayerInfo;
+			import com.cubeia.multitable.bus.MessageBusServer;
+			import com.cubeia.poker.config.PokerConfig;
+			import com.cubeia.poker.event.PokerEventDispatcher;
+			import com.cubeia.poker.event.PokerLobbyEvent;
+			import com.cubeia.poker.listener.PokerEventListener;
+			import com.cubeia.poker.login.LoginEvent;
+			import com.cubeia.poker.login.LoginWindow;
+			import com.cubeia.util.players.PlayerRegistry;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.managers.CursorManager;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ArrayUtil;
+			
+			public static var firebaseClient:FirebaseClient = new FirebaseClient();
+			public static var messageBusServer:MessageBusServer = new MessageBusServer();
+			public static var busName:String = "_poker_lobby_" + Math.round(Math.random() * 10000); 
+
+			[Bindable]
+			public static var playerInfo:PlayerInfo;
+
+			
+			[Bindable]
+			public static var playerAvatarUrl:String;
+
+			[Bindable]
+			public static var playerBalance:Number = new Number("");
+			
+			[Bindable]
+			private var players:ArrayCollection = new ArrayCollection();
+			
+			
+			// Flag if the client is executed within a QT Wrapper
+			public static var qtDemo:Boolean = false;
+			
+			private var pokerEventListener:PokerEventListener;
+			
+			private var loginWindow:LoginWindow;
+			
+			private var usr:String;
+			private var pwd:String;
+			private var operatorId:int;
+			
+			private var isConnected:Boolean = false;
+
+			
+			[Bindable]
+			public var auth_login:String = "";
+			
+			[Bindable]
+			public var auth_password:String = "";
+			
+			
+			[Bindable]
+			public var gameIdStr:String; 
+			
+			[Bindable]
+			private var _members:ArrayCollection;
+			
+			[Bindable]
+			private var _avatars:ArrayCollection;
+			
+			private function init():void
+			{
+				try {
+					
+				} catch (e:Error) {
+					Alert.show("Error in init " + e.getStackTrace().toString());
+				}
+				
+			}
+			private function faultHandler(fault:FaultEvent):void
+			{
+				CursorManager.removeBusyCursor();
+				var errorMessage:String = "code:\n" + fault.fault.faultCode + "\n\nMessage:\n" 
+					+ fault.fault.faultString + "\n\nDetail:\n" + fault.fault.faultDetail;
+				Alert.show(errorMessage);
+				trace("fault Handler " + errorMessage);
+			}
+			
+			public static function getAvatarUrl(pid:int):void {
+				trace("Getting avatar through service ");
+				var serviceTransportPacket:ServiceTransportPacket = new ServiceTransportPacket();
+				serviceTransportPacket.pid = pid;
+				serviceTransportPacket.idtype = 1;
+				//FIXME: to load service name from config to support multiple forum type thus multiple services
+				//serviceTransportPacket.service = "com.generic.games.service.GenericServiceContract";
+				serviceTransportPacket.service = "com.board.games.service.PokerBoardServiceContract";
+				serviceTransportPacket.seq = 0;
+				// server code : on action see service for detail
+				serviceTransportPacket.servicedata.writeUTFBytes("2"+";"+pid);
+				firebaseClient.send(serviceTransportPacket);
+			}		 	
+			
+			public static function getMultipleAvatarUrl(pid:int, request:String):void {
+				trace("Getting avatar through service ");
+				var serviceTransportPacket:ServiceTransportPacket = new ServiceTransportPacket();
+				serviceTransportPacket.pid = pid;
+				serviceTransportPacket.idtype = 1;
+				//FIXME: to load service name from config to support multiple forum type thus multiple services
+				//serviceTransportPacket.service = "com.generic.games.service.GenericServiceContract";
+				serviceTransportPacket.service = "com.board.games.service.PokerBoardServiceContract";
+				serviceTransportPacket.seq = 0;
+				// server code : on action see service for detail
+				serviceTransportPacket.servicedata.writeUTFBytes(request);
+				firebaseClient.send(serviceTransportPacket);
+			}		 	
+			
+
+			public static function getPlayerBalance(pid:int):void {
+				trace("getPlayerBalance through service ");
+				var serviceTransportPacket:ServiceTransportPacket = new ServiceTransportPacket();
+				serviceTransportPacket.pid = pid;
+				serviceTransportPacket.idtype = 1;
+				//FIXME: to load service name from config to support multiple forum type thus multiple services
+				//serviceTransportPacket.service = "com.generic.games.service.GenericServiceContract";
+				serviceTransportPacket.service = "com.board.games.service.PokerBoardServiceContract";
+				
+				
+				serviceTransportPacket.seq = 0;
+				// server code : on action see service for detail
+				serviceTransportPacket.servicedata.writeUTFBytes("4"+";"+pid);
+				firebaseClient.send(serviceTransportPacket);
+			}		 	
+			
+			
+			private function connect():void
+			{
+				
+				firebaseClient.addEventListener(ConnectEvent.CONNECT, onFirebaseConnect);
+				firebaseClient.addEventListener(DisconnectEvent.DISCONNECT, onFirebaseDisconnect);
+
+				
+				// setup login event handler
+				firebaseClient.addEventListener(LoginResponseEvent.LOGIN, onFirebaseLogin);
+				
+				messageBusServer.start(busName, firebaseClient);
+
+				displayLoginWindow();
+		
+			}
+			
+			
+			public function addPlayer(player:PokerPlayerInfo):void {
+				players.addItem(player);
+			}			
+			
+			private function onFirebaseConnect(connectEvent:ConnectEvent):void
+			{
+				isConnected = true;
+				// we have a connection to the game server, login
+				var loginRequestPacket:LoginRequestPacket = new LoginRequestPacket();
+				loginRequestPacket.user = usr;
+				loginRequestPacket.password = pwd;
+				loginRequestPacket.operatorid = operatorId;
+				firebaseClient.send(loginRequestPacket);
+
+			}
+			
+			private function onFirebaseDisconnect(disconnectEvent:DisconnectEvent):void
+			{
+				// TODO: add handler for disconnects (loss of network etc.)
+			}
+			
+			private function displayLoginWindow():void
+			{
+				// create and show Login popup window
+				loginWindow = new LoginWindow();
+				loginWindow.firebaseClient = firebaseClient;
+				PokerEventDispatcher.instance.addEventListener(LoginEvent.LOGIN_EVENT, onLoginClicked);
+				PopUpManager.addPopUp(loginWindow, this);
+				PopUpManager.centerPopUp(loginWindow);
+			}
+
+			private function onLoginClicked(loginEvent:LoginEvent):void
+			{
+				usr = loginEvent.username.toLowerCase();
+				pwd = loginEvent.password;
+				operatorId = loginEvent.operatorId;
+
+				Security.allowDomain("*");
+				if (!isConnected) {
+					var args:Array = loginEvent.host.split(":");
+					var port:String = args[1] != null ? args[1] : "4123";
+					// connect to firebase
+					firebaseClient.open(args[0], port, PokerConfig.getInstance().crossDomainPort);
+					
+				} else {
+					onFirebaseConnect(null);
+				}
+			}
+
+
+			private function onFirebaseLogin(loginEvent:LoginResponseEvent):void
+			{
+				
+				var retVal:int = -1;
+				retVal = loginEvent.getPlayerInfo().pid; 
+				// Checked if logged in ok, if so; swotch state and save information about the player
+				if ( retVal > 0) {
+					playerInfo = loginEvent.getPlayerInfo();
+					// load player info at login
+					getPlayerBalance(playerInfo.pid);
+					getAvatarUrl(playerInfo.pid);
+					PlayerRegistry.instance.addPlayerFromInfo(playerInfo);
+					currentState = "";
+					PokerEventDispatcher.dispatch(new PokerLobbyEvent(PokerLobbyEvent.LOGGED_IN));
+					pokerEventListener = new PokerEventListener(); 
+				} else if ( retVal ==  -1) {
+					Alert.show("Authentication failed: Password not matched.");
+				} else if ( retVal ==  -2) {
+					Alert.show("Authentication failed: You must make at least 1 post to play.");
+				} else  {
+					Alert.show("Authentication failed: Invalid account.");
+				} 
+			}
+		]]>
+	</mx:Script>
+	
+	
+	<pokerLib:states>
+		<mx:State name="login" enterState="connect()">
+			<mx:SetProperty target="{canvas1}" name="visible" value="false"/>
+		</mx:State>
+	</pokerLib:states>
+	
+	<mx:Canvas x="0" y="0" width="700" height="600" styleName="lobbyBackgroundCanvas" id="canvas1">
+		<ns1:LobbyCanvas x="10" y="108" width="680" height="372" />
+		<ns1:BannerFarm x="10" y="488" height="82" width="680" styleName="emphasis">
+		</ns1:BannerFarm>
+		<ns1:TopAreaCanvas x="10" y="10" width="680" height="90" styleName="emphasis" playerAvatar="{playerAvatarUrl}">
+		</ns1:TopAreaCanvas>
+	</mx:Canvas>
+	
+</pokerLib:StyledApplication>

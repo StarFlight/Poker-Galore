@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="1024" height="768" 
+		   xmlns:ns1="com.cubeia.poker.table.component.*"
+		   xmlns:component="com.cubeia.poker.table.component.*"
+	creationComplete="init()" styleName="tableCanvas"
+	horizontalScrollPolicy="off"
+	verticalScrollPolicy="off"
+>
+	
+	
+	<mx:Style source="table2.css" />
+	
+	<mx:Script>
+		<![CDATA[
+			import com.cubeia.poker.config.PokerConfig;
+			import com.cubeia.poker.config.SeatConfig;
+			import com.cubeia.poker.config.TableConfig;
+			import com.cubeia.poker.table.chipstack.ChipStackFactory;
+			import com.cubeia.poker.table.handler.TableHandler;
+			import com.cubeia.poker.table.model.Player;
+			import com.cubeia.poker.table.model.Seat;
+			import com.cubeia.poker.table.model.Table;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.controls.Alert;
+			import mx.events.PropertyChangeEvent;
+			public var watcherInstance:ChangeWatcher;
+		
+			[Bindable]
+			private var table:Table;
+			
+			private var seats:Array;
+			
+			private var tableConfig:TableConfig;
+			
+			public var tableWatcher:ChangeWatcher;
+
+			public var seatWatcher:ChangeWatcher;
+			
+			[Embed(source="/assets/poker_galore.swf")]
+			[Bindable]
+			public var tableCls:Class;
+			
+			
+			private function init():void {
+				addEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
+			}
+			
+			private function onMouseEvent(event:MouseEvent):void {
+/* 				myMouse.text = "Local X:" + event.localX  + " / Y: " + event.localY;
+				myMouse2.text = "Stage X:" + event.stageX  + " / Y: " + event.stageY;
+ */			}
+				
+			
+			public function setTableModel(table:Table):void {
+				
+				tableConfig = PokerConfig.getInstance().getTableConfig(table.getNumberOfSeats());
+				if ( tableConfig == null ) {
+					callLater(setTableModel, [table]);
+					return;
+				}
+				this.table = table;
+				var seatCount:int = table.getNumberOfSeats();
+				seats = new Array(seatCount);
+				
+				var i:int;
+				for (i = 0; i < seatCount; i++)
+				{
+					var seatConfig:SeatConfig = tableConfig.getSeatConfig(i);
+					
+					var container:SeatContainer = new SeatContainer();
+					
+					container.seat = table.seats.getItemAt(i) as Seat;
+					
+					container.seat.card1X = seatConfig.pocketCard1Position.x;
+					container.seat.card1Y = seatConfig.pocketCard1Position.y;
+					container.seat.card2X = seatConfig.pocketCard2Position.x;
+					container.seat.card2Y = seatConfig.pocketCard2Position.y;
+					
+					container.x = seatConfig.position.x;
+					container.y = seatConfig.position.y;
+					container.chipStackX = seatConfig.chipstackPosition.x;
+					container.chipStackY = seatConfig.chipstackPosition.y;
+				   
+				   seats[i] = container;
+				   this.addChild(container);
+				}
+				
+					
+				// Propagate table model to children
+				dealerButton.setTableModel(table);
+				communityCards.setTableModel(table);
+				
+				tableWatcher = ChangeWatcher.watch(table,["mainPot"], onMainPotChipStack)
+
+				var o:Object = tableLoader;
+				// Set up state model watcher(s)
+				// watch();
+			}
+					
+			private function onMainPotChipStack(event:PropertyChangeEvent):void {
+				if ( mainPotChipStack.numChildren > 0 ) {
+					mainPotChipStack.removeChildAt(0);
+				}
+				if ( table.mainPot != 0 ) {
+					mainPotChipStack.addChildAt(ChipStackFactory.getChipStack(table.mainPot),0);
+				}
+			}
+
+			private function onSeatEvent(event:PropertyChangeEvent):void {
+			}
+		//poker_table.swf //width="77%" height="85%" x="112" y="200"  
+		]]>
+	</mx:Script>
+	<mx:SWFLoader x="0" y="0"  width="100%" height="100%"  source="{tableCls}" scaleContent="true" id="tableLoader"/>
+	<ns1:TexasHoldemCommunityCards id="communityCards" x="325" y="320"/>
+	<mx:Image x="492" y="230" id="mainPotChipStack"/>
+	<ns1:DealerButtonCanvas id="dealerButton" x="585" y="260" /> 
+	<mx:Label x="608" y="687" text="My Player ID: {table.myPlayerId}"/>
+<!--	<mx:Label x="700" y="622" text="Label" width="200" id="myMouse"/>
+	<mx:Label x="700" y="640" text="Label" width="200" id="myMouse2"/>
+-->	
+	
+	
+	
+</mx:Canvas>

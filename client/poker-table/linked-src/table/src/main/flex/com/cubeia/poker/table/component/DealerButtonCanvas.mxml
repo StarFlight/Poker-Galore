@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="50" height="50" borderVisible="false" creationComplete="init()">
+	<fx:Declarations>
+		
+		<s:Parallel id="moveButton">
+			<s:Move id="changeDealer" duration="500"/>
+			<mx:SoundEffect id="moveButtonSound" useDuration="false" loops="0" source="{moveButtonSoundClass}" target="{this}"/>
+		</s:Parallel>
+		
+		
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.cubeia.games.poker.io.protocol.DealerButton;
+			import com.cubeia.poker.config.PokerConfig;
+			import com.cubeia.poker.config.TableConfig;
+			import com.cubeia.poker.event.PokerEventDispatcher;
+			import com.cubeia.poker.table.model.Table;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.events.PropertyChangeEvent;
+			
+			[Bindable]
+			[Embed(source="/assets/sounds/move_button.mp3")]
+			public var moveButtonSoundClass:Class;            
+			
+			private var currentSeat:int;
+			
+			private var tableConfig:TableConfig;
+			
+			[Bindable]
+			private var table:Table;
+			public var tableWatcher:ChangeWatcher;
+			
+			private function init():void {
+			}
+			
+			public function setTableModel(table:Table):void {
+				this.table = table;
+				tableWatcher = ChangeWatcher.watch(table,["dealerButtonPosition"], onDealerButtonMoved);
+				tableConfig = PokerConfig.getInstance().getTableConfig(table.getNumberOfSeats());
+			}
+			
+			private function onDealerButtonMoved(event:PropertyChangeEvent):void {
+				moveToSeat(table.dealerButtonPosition);
+			}
+
+			private function moveToSeat(seatid:int):void {
+				changeDealer.xTo = tableConfig.getSeatConfig(seatid).buttonPosition.x;
+				changeDealer.yTo = tableConfig.getSeatConfig(seatid).buttonPosition.y;
+				changeDealer.target = this;
+				currentSeat = seatid;
+				trace("Moving button");
+				if ( PokerTable.soundsEnabled ) {
+					moveButton.play();
+				} else {
+					changeDealer.play();
+				}
+			}
+				
+		]]>
+	</fx:Script>
+	
+	
+	<mx:Image x="0" y="0" width="32" height="32" source="assets/button.png" id="buttonImage" scaleContent="true"/>
+	
+</mx:Canvas>

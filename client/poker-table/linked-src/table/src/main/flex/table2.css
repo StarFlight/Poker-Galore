@@ -1,0 +1,63 @@
+/* Table UI */
+@namespace "http://www.adobe.com/2006/mxml";
+
+.tableBetSlider {
+	show-track-highlight: true;
+}
+
+/* Table objects */
+
+.tableCanvas {
+	
+}
+
+
+/* Seat & Player objects */
+
+.seatPlayerName {
+	font-weight: bold;
+}
+
+/* Seat & Player states */
+
+.tableSeatEmpty, .tableSeatReserved, .tableSeatWaitingToAct,
+.tableSeatActed, .tableSeatSitout, .tableSeatUnknown, .tableSeatAllIn {
+	background-color: black;
+	background-alpha: 0.5;
+	color: #ffffff;
+	borderColor: black;
+    borderStyle: solid;
+    corner-radius: 6;
+}
+
+.tableSeatEmpty {
+    background-color: gray;
+}
+
+.tableSeatReserved {
+	background-color: white;
+}
+
+.tableSeatWaitingToAct {
+    borderColor: red;
+}
+
+.tableSeatActed {
+    borderColor: yellow;
+}
+
+.tableSeatSitout {
+	background-alpha: 0.1;
+}
+
+.tableSeatUnknown {
+	background-color: red;
+}
+
+.tableSeatAllIn {
+	borderColor: white;
+	background-color: red;
+}
+
+
+

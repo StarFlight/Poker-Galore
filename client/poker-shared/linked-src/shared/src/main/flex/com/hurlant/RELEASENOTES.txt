@@ -1,0 +1,29 @@
+As3 Crypto Library
+
+- 1.2
+  - math: Completed BigInteger support. Moved BigInteger under com.hurlant.math
+  - public key: RSA decrypt and key generation
+  - crud: basic DER/PEM support to parse RSA keys (X.509 SubjectPublicKeyInfo and PKCS#1 RSAPrivateKey)
+  - random: support for TLS-PRF; weak attempt at seeding Random.
+  - hash: added MD2. slow legacy stuff.
+  - modes: CFB, CFB8 and OFB padding bug fixes
+  - secret key: TripeDES bug fix
+  - demo UI: added OpenSSL Monkey tab that checks that a few operations are compatible between As3Crypto and OpenSSL
+  - demo UI: added UI for RSA decryption and key generation
+
+- 1.1
+  - secret key: DES, 3DES, BlowFish
+  - mode: CTR, SimpleIV
+  - demo UI: Added unit tests
+  - added toString() to each algorithm
+  - added dispose() to each algorithm. dispose() attempts to clear keys and states from the memory, but it is not guaranteed to work.
+  - build-swc.xml file to allow command-line compilation of a .SWC library file.
+
+- Initial release (1.0)
+  - public key: RSA encrypt
+  - secret key: AES, XTEA, RC4
+  - hash: MD5, SHA-1, SHA-224, SHA-256
+  - HMAC
+  - modes: ECB, CBC, CFB, CFB8, OFB
+  - converters: Base64, Hex
+  - Demo UI with benchmarking  

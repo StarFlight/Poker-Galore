@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="400" height="300">
+	<mx:Array id="tableTypes">
+		<mx:Object label="No Limit" lobbyPath="nolimit"/>
+		<mx:Object label="Fixed Limit" lobbyPath="fixedlimit"/>
+		<mx:Object label="Pot Limit" lobbyPath="potlimit"/>
+	</mx:Array>
+
+	<mx:ToggleButtonBar dataProvider="{tableTypes}" top="2" left="10"/>
+
+</mx:Canvas>

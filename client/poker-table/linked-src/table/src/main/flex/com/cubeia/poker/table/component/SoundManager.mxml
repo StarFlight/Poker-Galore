@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="0" height="0">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.cubeia.games.poker.io.protocol.ActionTypeEnum;
+			
+			[Bindable]
+			[Embed(source="/assets/sounds/fold.mp3")]
+			public var foldSoundClass:Class;       
+			
+			[Bindable]
+			[Embed(source="/assets/sounds/bet.mp3")]
+			public var betSoundClass:Class;       
+			
+			[Bindable]
+			[Embed(source="/assets/sounds/check.mp3")]
+			public var checkSoundClass:Class;       
+			
+			public function playAction(actionType:int):void {
+				if ( !PokerTable.soundsEnabled ) {
+					return;
+				}
+				trace("Playing sound: " + actionType);
+				switch ( actionType ) {
+					
+					case ActionTypeEnum.BET :
+						betSound.play();
+						break;
+					case ActionTypeEnum.CALL :
+						betSound.play();
+						break;
+					case ActionTypeEnum.RAISE :
+						betSound.play();
+						break;
+				
+					case ActionTypeEnum.CHECK :
+						checkSound.play();
+						break;
+					
+					case ActionTypeEnum.FOLD :
+						foldSound.play();
+						break;
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<mx:SoundEffect id="foldSound" source="{foldSoundClass}" target="{this}" useDuration="false"/>
+		<mx:SoundEffect id="betSound" source="{betSoundClass}" target="{this}" useDuration="false"/>
+		<mx:SoundEffect id="checkSound" source="{checkSoundClass}" target="{this}" useDuration="false"/>
+	</fx:Declarations>
+</s:Group>

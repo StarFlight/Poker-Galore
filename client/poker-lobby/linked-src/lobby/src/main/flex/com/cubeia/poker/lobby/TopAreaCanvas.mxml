@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="680" height="90" xmlns:ns1="com.cubeia.poker.lobby.component.user.*">
+	
+	
+	<mx:TextArea x="250" y="0" height="100%" width="100%" styleName="logoTextArea">
+             <mx:text>
+             </mx:text>
+    </mx:TextArea>
+	<mx:Script>
+		<![CDATA[
+			
+			[Bindable]
+			public var playerAvatar:String;
+	]]>
+	</mx:Script>
+	<ns1:UserInfo y="0" height="100%" width="300"  x="260"/>
+	<mx:Image x="4" y="4" height="82" width="83" source="assets/logo.png" scaleContent="true"/>
+	<!--<mx:SWFLoader x="4" y="4"  height="100%" width="100%"  source="assets/logo.swf" scaleContent="true" id="logo"/>-->	
+	<mx:Image x="100" y="4" height="100%" width="150" source="{playerAvatar}" id="avatarImg" scaleContent="true"/>
+
+</mx:Canvas>

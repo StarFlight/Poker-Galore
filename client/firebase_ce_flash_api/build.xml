@@ -1,0 +1,38 @@
+<project name="firebase-flash-api" basedir="./">
+
+  <target name="clean-generated-sources">
+    <property name="srcDir" value="${srcDirectory}/main/flex/com/cubeia/firebase/io/protocol"/>
+    <mkdir dir="${srcDir}" />
+    <delete>
+      <fileset dir="${srcDir}" includes="**/*" />
+    </delete>
+  </target>
+
+  <target name="assembly">
+    <property name="finalName" value="${name}-${version}" />
+    <mkdir dir="${buildDirectory}/${finalName}" />
+    <copy todir="${buildDirectory}/${finalName}">
+      <fileset dir="${basedir}">
+	<include name="*.xml" />
+	<include name="*.txt" />
+      </fileset>
+    </copy>
+    <copy todir="${buildDirectory}/${finalName}/src">
+      <fileset dir="${basedir}/src" />
+    </copy>
+    <copy todir="${buildDirectory}/${finalName}/lib">
+      <fileset dir="${buildDirectory}">
+	<include name="${finalName}.swc" />
+      </fileset>
+    </copy>
+    <!-- copy todir="${buildDirectory}/${finalName}/lib">
+      <fileset dir="${buildDirectory}/lib">
+	<include name="**/*" />
+      </fileset>
+    </copy -->
+    <zip destfile="${buildDirectory}/${finalName}.zip">
+      <zipfileset dir="${buildDirectory}/${finalName}" prefix="${finalName}" />
+    </zip>
+  </target>
+
+</project>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:component="com.cubeia.poker.table.component.*"
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" 
+		   width="95" height="76" 
+		   verticalScrollPolicy="off" horizontalScrollPolicy="off" clipContent="false" 
+		   creationComplete="init()">
+	
+	<fx:Declarations>
+	
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.cubeia.poker.table.chipstack.ChipStackFactory;
+			import com.cubeia.poker.table.model.Seat;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.events.PropertyChangeEvent;
+			
+			import mx.controls.Alert;
+			[Bindable]
+			public var seat:Seat;
+			
+			[Bindable]
+			public var seatInfo:SeatCanvas;
+			
+			[Bindable]
+			public var chipStackX:int;
+			
+			[Bindable]
+			public var chipStackY:int;
+			
+			public var playerWatcher:ChangeWatcher;
+			
+			public var playerStatusWatcher:ChangeWatcher;
+			
+			private function init():void {
+				seatInfo = new SeatCanvas();
+				seatInfo.id = "seatCanvas";
+				seatInfo.x = 0;
+				seatInfo.y = 0;
+				seatInfo.seat = seat;
+				this.addChild(seatInfo);
+				watch();
+			}
+			
+			private function watch():void {
+				playerStatusWatcher = ChangeWatcher.watch(seat,["player","betStack"], onPlayerChipStack);
+			}
+
+	
+			
+			private function onPlayerChipStack(event:PropertyChangeEvent):void {
+				if (seat.player != null) {
+					if ( chipStack.numChildren > 0 ) {
+						chipStack.removeChildAt(0);
+					}
+					if ( seat.player.betStack != 0 ) {
+						chipStack.addChildAt(ChipStackFactory.getChipStack(seat.player.betStack),0);
+					}
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	
+	
+	<!-- REMOVE ME WHEN WE HAVE CHIP STACKS -->
+	<mx:Label x="0" y="65" text="${(seatInfo.seat.player.betStack/100).toFixed(2)}" width="70" height="20" color="#53C253" visible="{seatInfo.seat.player.betStack > 0}"/>
+	<mx:Image x="{chipStackX}" y="{chipStackY}" id="chipStack"/>
+	<component:BigPocketCardCanvas x="{seat.card1X}" y="{seat.card1Y}" id="privateCard1" width="52" height="72" bigCard="{seat.player.pocketCards.getItemAt(0) as WrappedGameCard}"/>
+	<component:BigPocketCardCanvas x="{seat.card2X}" y="{seat.card2Y}"  id="privateCard2" width="52" height="72" bigCard="{seat.player.pocketCards.getItemAt(1) as WrappedGameCard}"/>
+	
+</mx:Canvas>

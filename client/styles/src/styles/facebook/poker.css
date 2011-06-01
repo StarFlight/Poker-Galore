@@ -1,0 +1,421 @@
+@namespace "http://www.adobe.com/2006/mxml";
+
+/**
+//-----------------------------------------
+// Type faces
+//
+*/
+/*
+@font-face
+{
+  src:url("arial.ttf");
+  fontFamily: "FacebookArial";
+}
+
+@font-face
+{
+  src:url("arialbd.ttf");
+  fontFamily: "FacebookArial";
+  fontWeight: bold;
+}
+
+@font-face
+{
+  src:url("ariali.ttf");
+  fontFamily: "FacebookArial";
+  fontStyle: italic;
+}
+
+@font-face
+{
+  src:url("arialbi.ttf");
+  fontFamily: "FacebookArial";
+  fontStyle: italic;
+  fontWeight: bold;
+}
+*/
+
+.faceBookTitle {
+   color: #ffffff;
+   fontFamily: Arial;
+   fontSize: 12;
+   fontWeight: normal;
+}
+
+
+/*
+//------------------------------
+//  Application
+//------------------------------
+*/
+Application
+{
+	backgroundGradientAlphas: 1.0, 1.0;
+	backgroundGradientColors: #fff, #fff;
+	backgroundColor: #fff;
+    themeColor: #3b5998;
+    color: #000;
+    borderColor: #fff;
+    font-family: Arial;
+}
+
+
+/*
+//------------------------------
+//  Alert
+//------------------------------
+*/
+Alert
+{
+	backgroundAlpha:1;
+	borderAlpha:1;
+	backgroundColor:#333333;
+	borderColor:#555555;
+	buttonStyleName: Button;
+	paddingBottom: 8;
+}
+
+
+/*
+//------------------------------
+//  Button
+//------------------------------
+*/
+Button
+{
+	fillColors: #3b5998, #3b5998;
+	fillAlphas: 1.0, 1.0;
+	borderColor: #3b5998;
+	color: #fff;
+	textRollOverColor: #fff;
+	textSelectedColor:#fff;
+	disabledColor:#ccc;
+	fontWeight:normal;
+	cornerRadius: 1;
+	focusAlpha: 1.0;
+}
+
+.buttonStyle
+{
+	fillColors: #3b5998, #3b5998;
+	fillAlphas: 1.0, 1.0;
+	borderColor: #3b5998;
+	color: #fff;
+	textRollOverColor: #fff;
+	textSelectedColor:#fff;
+	disabledColor:#ccc;
+	fontWeight:normal;
+	cornerRadius: 1;
+	focusAlpha: 1.0;
+}
+
+
+
+
+/*
+//------------------------------
+//  Canvas
+//------------------------------
+*/
+
+Canvas
+{
+	background-color: #FFFFFF;
+	backgroundAlpha: 0.0;
+}
+
+Canvas.lobbyBackgroundCanvas
+{
+	color: #FFFFFF;
+	borderWidth: 0;
+	border-style: none;
+	backgroundAlpha: 1.0;
+	fillAlphas: 1.0, 1.0;
+	backgroundImage: Embed(source="lobby-bg.png");
+	background-alpha: 0.3;
+	dropShadowEnabled: "false";
+}
+
+Canvas.emphasis
+{
+	background-color: #FFFFFF;
+	backgroundAlpha: 0.45;
+	
+	headerHeight: 18;
+	
+	borderColor: #000000;
+	border-style: solid;
+	borderWidth: 1;
+	borderAlpha: 1.0;
+	cornerRadius: 0;
+	roundedBottomCorners: false;
+	
+	dropShadowEnabled: "true";
+	shadowDirection: "right";
+	shadowDistance: 2.0;
+} 
+
+
+/*
+//------------------------------
+//  Data Grid
+//------------------------------
+*/
+
+DataGrid {
+   backgroundAlpha: 1;
+   headerColors: #3B5998, #3B5998;
+   verticalGridLines: false;
+   useRollOver: false;
+   selectionColor: #3B5998;
+   color: #000000;
+   textSelectedColor: #FCF9F9;
+   textIndent: 0;
+   fontSize: 10;
+   headerStyleName: "mydataGridHeaderStyle";
+   
+   borderColor: #000000;
+   borderThickness: 0;
+   borderStyle: solid;
+   
+   dropShadowEnabled: "false";
+   shadowDirection: "right";
+   shadowDistance: 2.0;
+}
+
+.mydataGridHeaderStyle {
+   color: #FFFEFE;
+   fontSize: 10;
+}
+.dataGridVerticalScrollBar
+{
+}
+
+
+/*
+//------------------------------
+//  Label
+//------------------------------
+*/
+Label
+{
+	color: #000;
+	disabledColor: #ddd;
+}
+
+Label.userheading {
+	font-size:16;
+	font-weight: bold;
+}
+
+
+/*
+//------------------------------
+//  List
+//------------------------------
+*/
+List
+{
+	background-alpha: 0;
+	border-style: none;
+}
+
+
+
+/*
+//------------------------------
+//  Panel
+//------------------------------
+*/
+/* Panel without backgroundImage and titleBackgroundSkin. */
+
+Panel
+{
+	backgroundColor: #fff;
+	backgroundAlpha: 0.45;
+	borderColor: #000;
+	header-colors: #3b5998, #3b5998;
+	cornerRadius: 0;
+	borderThicknessRight: 1;
+	borderThicknessLeft: 1;
+	borderThicknessBottom: 1;
+	roundedBottomCorners: false;
+	shadowDirection: "right";
+	shadowDistance: 2;
+	headerHeight: 18;
+	borderAlpha: 1.0;
+	titleStyleName: "faceBookTitle";
+} 
+
+.superPanel
+{
+	backgroundColor: #ddd;
+	borderColor: #555;
+	cornerRadius: 0;
+	borderThicknessLeft: 1;
+	borderThicknessRight: 1;
+	roundedBottomCorners: false;
+	shadowDirection: "center";
+	shadowDistance: 0.0;
+	headerHeight: 0;
+	borderAlpha: 1.0;
+	titleStyleName: "faceBookTitle";
+} 
+
+/*
+//------------------------------
+//  TextArea
+//------------------------------
+*/
+TextArea
+{
+	color: #FFFFFF;
+	borderColor: #000000;
+	backgroundAlpha: 1.0; 
+}
+
+
+/*
+//------------------------------
+//  TextInput
+//------------------------------
+*/
+TextInput
+{
+	backgroundAlpha: 1.0;
+	borderColor: #ddd;
+	color: #000;
+	borderStyle: inset;
+	paddingTop: 2;
+}
+
+
+.seatPanel
+{
+	backgroundColor: #fff;
+	borderColor: #3b5998;
+	cornerRadius: 0;
+	borderThicknessLeft: 1;
+	borderThicknessRight: 1;
+	roundedBottomCorners: false;
+	shadowDirection: "center";
+	shadowDistance: 0.0;
+	headerHeight: 18;
+	borderAlpha: 1.0;
+	backgroundAlpha: 0.54;
+	titleStyleName: "faceBookTitle";
+} 
+
+
+/*
+//------------------------------
+//  Tab Bar
+//------------------------------
+*/
+TabBar
+{
+	tabStyleName: "tabStyle";
+	selected-tab-text-style-name: "selectedTabStyle";
+}
+
+.tabStyle {
+   tabHeight: 18;
+   background-alpha: 0.5;
+   highlightAlphas: 0, 0;
+   fillAlphas: 1, 1, 1, 1;
+   fillColors: #3b5998, #3b5998, #afbdd7, #3b5998;
+   color: #FFFFFF;
+   textRollOverColor: #000000;
+   textSelectedColor: #FF0000;
+   fontSize: 10;
+   fontWeight: normal;
+   fontStyle: normal;
+   
+}
+
+.selectedTabStyle {
+   color: #000000;
+  backgroundAlpha: 0.5;
+}
+
+/*
+//------------------------------
+//  Tab Navigator
+//------------------------------
+*/
+
+TabNavigator {
+	background-alpha: 0.5;
+}
+
+/*
+//------------------------------
+//  Toggle Button Bar
+//------------------------------
+*/
+
+ToggleButtonBar {
+   buttonHeight: 20;
+   buttonWidth: 80;
+   buttonStyleName: "pokerButtonBarButtonStyle";
+   selectedButtonTextStyleName: "pokerButtonBarSelectedButtonStyle";
+
+   highlightAlphas: 0, 0;
+   fillAlphas: 1, 1, 1, 1;
+   fillColors: #00FF00, #00FF00, #0000FF, #0000FF;
+   color: #ffffff;
+   textRollOverColor: #ffffff;
+   textSelectedColor: #ffffff;
+   fontSize: 10;
+   fontWeight: normal;
+}
+ 
+.pokerButtonBarButtonStyle {
+   highlightAlphas: 0, 0;
+   fillAlphas: 1, 1, 1, 1;
+   fillColors: #FFFFFF, #3b5998, #afbdd7, #3b5998;
+   color: #FFFFFF;
+   textRollOverColor: #ffffff;
+   textSelectedColor: #ffffff;
+   fontSize: 10;
+   fontWeight: normal;
+   fontStyle: normal;
+}
+ 
+.pokerButtonBarSelectedButtonStyle {
+   color: #ffffff;
+   fontSize: 10;
+   fontWeight: normal;
+   fontStyle: normal;
+   textDecoration: none;
+
+}
+
+
+/*
+//------------------------------
+//
+//  POKER CLIENT SPECIFIC CLASSES
+//
+//------------------------------
+//  Lobby Classes
+//------------------------------
+*/
+
+
+
+.lobbyFilterText
+{
+	color: #3b5998;
+	textRollOverColor: #c00000; 
+	fillColors: #3b5998, #3b5998, #c00000, #c00000;
+}
+
+.logoTextArea {
+	color: #FFFFFF;
+	fontSize: 16;
+	background-color: #3b5998;
+	border-thickness: 0;
+}
+	
+/* End */

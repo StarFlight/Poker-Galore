@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- 
+ * Copyright (C) 2009 Cubeia Ltd <info@cubeia.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->	
+
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="318" height="234" title="Login" 
+				defaultButton="{loginButton}" creationComplete="setupLoginHandler()"  verticalScrollPolicy="off" horizontalScrollPolicy="off">
+
+	<mx:Script>
+		<![CDATA[
+			import com.cubeia.firebase.connector.FirebaseClient;
+			import com.cubeia.firebase.events.LoginResponseEvent;
+			import com.cubeia.poker.event.PokerEventDispatcher;
+			
+			import mx.controls.Alert;
+			import mx.managers.FocusManager;
+			import mx.managers.PopUpManager;
+			
+			public var firebaseClient:FirebaseClient;
+			
+			[Bindable]
+			private var loginPending:Boolean = false;
+
+			
+			private function setupLoginHandler():void
+			{
+				// add listener for login events
+				firebaseClient.addEventListener(LoginResponseEvent.LOGIN, onLoginResponse, false, 100);
+			}
+			
+			
+			private function onLoginResponse(loginReponseEvent:LoginResponseEvent):void
+			{
+				trace("Login Response received: "+loginReponseEvent);
+				if (loginReponseEvent.getPlayerInfo().pid > 0) {
+					// we have received a login response, remove ourself
+					firebaseClient.removeEventListener(LoginResponseEvent.LOGIN, onLoginResponse);
+					PopUpManager.removePopUp(this);
+				} else {
+					//Alert.show("Login failed");
+				}
+				loginPending = false;
+			}
+		
+			
+			private function onLoginClicked():void
+			{
+				
+				// protect multiple clicks
+				loginPending = true;
+				
+				// login to game server
+				PokerEventDispatcher.dispatch(new LoginEvent(username.text, password.text, host.text, int(operatorId.text)));
+				trace("Send Connect & Login");
+			}
+			
+			private function setUsernameFocus():void
+			{
+				focusManager.setFocus(username);
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Label x="11" y="10" text="Host:" fontWeight="normal" fontSize="12"/>
+	<mx:TextInput id="host" x="134" y="8" width="162" tabEnabled="true" tabIndex="3" fontSize="12" text="xtrasocial.org"/>
+	<mx:Label x="10" y="72" text="Username:"/>
+	<mx:Label x="10" y="103" text="Password:"/>
+	<mx:Label x="10" y="41" text="Operator ID:" toolTip="Only needed if you use external integration (i.e. outside of Firebase)"/>
+	<mx:TextInput x="134" y="70" id="username" width="162" tabIndex="1" creationComplete="setUsernameFocus()"/>
+	<mx:TextInput x="134" y="101" id="password" width="162" displayAsPassword="true" tabIndex="2" />
+	<mx:TextInput x="134" y="39" id="operatorId" width="31" tabIndex="2" text="1" toolTip="Only needed if you use external integration (i.e. outside of Firebase)"/>
+	<mx:Button x="134" y="152" label="Login" click="onLoginClicked()" id="loginButton" enabled="{username.text.length > 0 &amp;&amp; password.text.length > 0}" tabIndex="3" color="#FFFFFF" width="162"/>
+	
+</mx:TitleWindow>
